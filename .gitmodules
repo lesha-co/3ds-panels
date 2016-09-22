@@ -1,0 +1,3 @@
+[submodule "3ds_string_utils"]
+	path = 3ds_string_utils
+	url = https://github.com/malyavkin/3ds_string_utils
