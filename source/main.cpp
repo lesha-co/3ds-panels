@@ -59,15 +59,21 @@ int main(int argc, char **argv)
         if ((kHeld | kDown) & KEY_UP){
             active->moveUp();
         }
+        if ((kHeld | kDown) & KEY_DLEFT){
+            active->moveTop();
+        }
+        if ((kHeld | kDown) & KEY_DRIGHT){
+            active->moveEnd();
+        }
         if (kDown & KEY_A){
             active->enter();
         }
-        if (kDown & KEY_DLEFT){
+        if (kDown & KEY_L){
             active = &leftFilePane;
             leftFilePane.setActive(true);
             rightFilePane.setActive(false);
         }
-        if (kDown & KEY_DRIGHT){
+        if (kDown & KEY_R){
             active = &rightFilePane;
             rightFilePane.setActive(true);
             leftFilePane.setActive(false);
