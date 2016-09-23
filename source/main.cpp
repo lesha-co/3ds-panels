@@ -1,6 +1,8 @@
 #include <3ds.h>
 #include <cstdio>
 #include <iostream>
+#include <unistd.h>
+#include "common.h"
 #include "../3ds_string_utils/source/string_utils.h"
 #include "FilePane.h"
 
@@ -12,8 +14,9 @@ int main(int argc, char **argv)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// run once begin
     ///
+    consoleInit(GFX_BOTTOM, &bottom);
+
     consoleInit(GFX_TOP, NULL);
-    PrintConsole menu, leftpan, rightpan, console, actions, context, all;
     consoleInit(GFX_TOP, &leftpan);
     consoleInit(GFX_TOP, &rightpan);
     consoleInit(GFX_TOP, &console);
@@ -29,6 +32,7 @@ int main(int argc, char **argv)
     consoleSetWindow(&actions,   0, 29, 50, 1);
     consoleSetWindow(&context,   5, 1, 20, 20);
 
+    chdir("/");
     FilePane leftFilePane(leftpan, "");
     FilePane rightFilePane(rightpan, "");
     FilePane* active;
@@ -43,7 +47,7 @@ int main(int argc, char **argv)
     while (aptMainLoop())
     {
         hidScanInput();
-        u32 kHeld = hidKeysHeld();
+        u32 kHeld = 0;// hidKeysHeld();
         u32 kDown = hidKeysDown();
         if (kDown & KEY_START) break; // break in order to return to hbmenu
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
