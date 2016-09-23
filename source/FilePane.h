@@ -15,12 +15,13 @@
 #include <sstream>
 #include "common.h"
 #define  UPDIR ".."
-const char VERTICAL_BORDER = (char)0xB3;
-const char HORIZONTAL_BORDER = (char)0xC4;
-const char TOP_LEFT_CORNER_BORDER = (char)0xDA;
-const char TOP_RIGHT_CORNER_BORDER = (char)0xBF;
-const char BOTTOM_LEFT_CORNER_BORDER = (char)0xC0;
-const char BOTTOM_RIGHT_CORNER_BORDER = (char)0xD9;
+const string VERTICAL_BORDER = {(char)0xB3};
+const string HORIZONTAL_BORDER = {(char)0xC4};
+const string TOP_LEFT_CORNER_BORDER = {(char)0xDA};
+const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
+const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
+const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
+const string UPWARDS_ARROW = {(char)0x18};
 const string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
 const string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
 template <class T>
@@ -162,7 +163,7 @@ public:
         if (this->getNumberOfItems() < this->getDisplayHeight()){
             this->ctx.startingIndex = 0;
         } else {
-            this->ctx.startingIndex = this->ctx.selectedItem - this->getDisplayHeight();
+            this->ctx.startingIndex = this->ctx.selectedItem - this->getDisplayHeight() + 1;
         }
 
         draw();
@@ -180,9 +181,12 @@ public:
         if(f.special && f.name==UPDIR){
             updir();
         } else {
-            history.push_back(this->ctx);
-            setCWD(f.path);
-            draw();
+            if(S_ISDIR(f.stats.st_mode)){
+                history.push_back(this->ctx);
+                setCWD(f.path);
+                draw();
+            }
+
         }
     }
 private:
@@ -193,13 +197,13 @@ private:
     }
     string getTypeIcon(FileInfo info) {
 
-        if(S_ISDIR(info.stats.st_mode)){
-            return "/";
-        }
         if(info.special){
             if(info.name == UPDIR){
-                return "/";
+                return UPWARDS_ARROW;
             }
+        }
+        if(S_ISDIR(info.stats.st_mode)){
+            return "/";
         }
         return " ";
     }
@@ -223,8 +227,14 @@ private:
             cout << position(i + offset,0);
             u32 drawingItem = i + this->ctx.startingIndex;
             cout << BG_DEFAULT << VERTICAL_BORDER;
-            if(drawingItem == this->ctx.selectedItem && this->active) {
+            bool is_selected = (drawingItem == this->ctx.selectedItem && this->active);
+            if(is_selected) {
                 cout << BG_HIGHLIGHT;
+                consoleSelect(&bottom);
+                printf("\nStat for file %s\n", this->getItem(drawingItem).name.c_str());
+                printf("Path: %s\n", this->getItem(drawingItem).path.c_str());
+                printf("Mode: %d\n", this->getItem(drawingItem).stats.st_mode);
+                consoleSelect(&this->printConsole);
             }
             string filename = "";
             string type = " ";
@@ -234,7 +244,7 @@ private:
             }
 
             cout << type << this->prepareFilename(filename) << VERTICAL_BORDER << "     ";
-            if(drawingItem == this->ctx.selectedItem && this->active) {
+            if(is_selected) {
                 cout << BG_DEFAULT;
             }
             cout  << VERTICAL_BORDER;

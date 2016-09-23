@@ -14,6 +14,7 @@ int main(int argc, char **argv)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// run once begin
     ///
+    // screen definitions
     consoleInit(GFX_BOTTOM, &bottom);
 
     consoleInit(GFX_TOP, NULL);
@@ -32,13 +33,14 @@ int main(int argc, char **argv)
     consoleSetWindow(&actions,   0, 29, 50, 1);
     consoleSetWindow(&context,   5, 1, 20, 20);
 
+    // init stuff
     chdir("/");
     FilePane leftFilePane(leftpan, "");
     FilePane rightFilePane(rightpan, "");
     FilePane* active;
     active = &leftFilePane;
     leftFilePane.setActive(true);
-
+    drawASCII();
 
     ///
     /// run once end
