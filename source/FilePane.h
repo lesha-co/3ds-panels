@@ -8,6 +8,7 @@
 #include <fstream>
 #include <3ds.h>
 #include <iostream>
+#include <dirent.h>
 #include <string>
 #include <vector>
 #include <sys/stat.h>

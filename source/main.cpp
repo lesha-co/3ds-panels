@@ -1,16 +1,11 @@
 #include <3ds.h>
 #include <cstdio>
 #include <iostream>
-#include <dirent.h>
 #include "../3ds_string_utils/source/string_utils.h"
 #include "FilePane.h"
 
 using namespace std;
 
-void a(vector<int>* c){
-    c->push_back(1);
-
-}
 int main(int argc, char **argv)
 {
     gfxInitDefault();
