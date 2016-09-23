@@ -53,6 +53,14 @@ struct DisplayContext{
 };
 vector<FileInfo> list_files(string dir){
     vector<FileInfo> v;
+    consoleInit(GFX_BOTTOM, &bottom);
+    printf("Listing dir %s", dir.c_str());
+    if (dir != ""){
+        FileInfo up;
+        up.name = UPDIR;
+        up.special = true;
+        v.push_back(up);
+    }
     DIR *dp;
     dirent *dirp;
 
@@ -84,8 +92,6 @@ public:
     FilePane(PrintConsole printConsole, string cwd) {
         this->printConsole = printConsole;
         this->active = false;
-        this->updir.name=UPDIR;
-        this->updir.special = true;
         this->setCWD(cwd);
         this->draw();
     }
@@ -97,11 +103,8 @@ public:
 
 
     FileInfo getItem(u32 index) {
-        if(index == 0){
-            return updir;
-        } else {
-            return this->items[index-1];
-        }
+        return this->items[index];
+
     }
 
     FileInfo getSelectedItem() {
@@ -147,6 +150,22 @@ public:
             }
             draw();
         }
+    }
+
+    void moveTop(){
+        this->ctx.selectedItem = 0;
+        this->ctx.startingIndex = 0;
+        draw();
+    }
+    void moveEnd(){
+        this->ctx.selectedItem = this->getMaxIndex();
+        if (this->getNumberOfItems() < this->getDisplayHeight()){
+            this->ctx.startingIndex = 0;
+        } else {
+            this->ctx.startingIndex = this->ctx.selectedItem - this->getDisplayHeight();
+        }
+
+        draw();
     }
 
     void enter(){
@@ -196,6 +215,7 @@ private:
         consoleSelect(&this->printConsole);
         cout << position(0,0) << BG_DEFAULT;
         drawHeader();
+        // number of lines we need to skip from the top of console ( top border in this case)
         u32 offset = 1;
         for (u32 i = 0; i < this->getDisplayHeight() ; ++i) {
             cout << position(i + offset,0);
@@ -244,23 +264,23 @@ private:
         return (u32)wt;
     }
 
-
-
     u32 getBottomIndex(){
         return this->ctx.startingIndex + this->getDisplayHeight() - 1;
     }
 
     u32 getMaxIndex(){
-        // not doing -1 because we have extra item on top [..]
-        return this->items.size();
+        return getNumberOfItems()-1;
+    }
+    u32 getNumberOfItems(){
+        return items.size();
     }
 
     PrintConsole printConsole;
     vector<FileInfo> items;
     vector<DisplayContext> history;
-    FileInfo updir;
     DisplayContext ctx;
     bool active;
+    // # of lines that occupied by things that are not list of files
     const int OCCUPIED = 2;
 };
 
