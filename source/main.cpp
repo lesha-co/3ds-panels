@@ -68,6 +68,9 @@ int main(int argc, char **argv)
         if (kDown & KEY_A){
             active->enter();
         }
+        if (kDown & KEY_B){
+            active->updir();
+        }
         if (kDown & KEY_L){
             active = &leftFilePane;
             leftFilePane.setActive(true);

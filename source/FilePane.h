@@ -167,21 +167,23 @@ public:
 
         draw();
     }
-
+    void updir(){
+        if(history.size()){
+            DisplayContext restored = history.back();
+            history.pop_back();
+            setContext(restored);
+            draw();
+        }
+    }
     void enter(){
         FileInfo f = getSelectedItem();
         if(f.special && f.name==UPDIR){
-            if(history.size()){
-                DisplayContext restored = history.back();
-                history.pop_back();
-                setContext(restored);
-            }
-
+            updir();
         } else {
             history.push_back(this->ctx);
             setCWD(f.path);
+            draw();
         }
-        draw();
     }
 private:
     void setContext(DisplayContext newContext){
