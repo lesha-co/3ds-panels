@@ -46,7 +46,11 @@ struct FileInfo{
     bool special;
     s_stat stats;
 };
-
+struct DisplayContext{
+    string cwd;
+    u32 selectedItem = 0;
+    u32 startingIndex = 0;
+};
 vector<FileInfo> list_files(string dir){
     vector<FileInfo> v;
     DIR *dp;
@@ -79,8 +83,6 @@ class FilePane {
 public:
     FilePane(PrintConsole printConsole, string cwd) {
         this->printConsole = printConsole;
-        this->startingIndex = 0;
-        this->selectedItem = 0;
         this->active = false;
         this->updir.name=UPDIR;
         this->updir.special = true;
@@ -93,13 +95,6 @@ public:
         draw();
     }
 
-    void setSelectedItemIndex(u32 item) {
-        this->selectedItem = item;
-    }
-
-    u32 getSelectedItemIndex() {
-        return this->selectedItem;
-    }
 
     FileInfo getItem(u32 index) {
         if(index == 0){
@@ -110,28 +105,29 @@ public:
     }
 
     FileInfo getSelectedItem() {
-        return getItem(this->selectedItem);
+        return getItem(this->ctx.selectedItem);
     }
 
     string getCWD() {
-        return this->cwd;
+        return this->ctx.cwd;
     }
 
     void setCWD(string cwd) {
-        this->cwd = cwd;
-        this->items = list_files(this->cwd);
-        this->selectedItem = 0;
+        this->ctx.cwd = cwd;
+        this->items = list_files(cwd);
+        this->ctx.selectedItem = 0;
+        this->ctx.startingIndex = 0;
     }
 
     void moveUp(){
-        if(this->selectedItem > 0){
-            this->selectedItem--;
+        if(this->ctx.selectedItem > 0){
+            this->ctx.selectedItem--;
             // если курсор совпадает с самым верхним отображающимся элементом
-            if (this->selectedItem == this->startingIndex){
+            if (this->ctx.selectedItem == this->ctx.startingIndex){
                 // если после перемещения курсор не стал совпадать с самым первым элементом
-                if (this->selectedItem > 0){
+                if (this->ctx.selectedItem > 0){
                     //двигаем окно вверх
-                    this->startingIndex = this->selectedItem-1;
+                    this->ctx.startingIndex = this->ctx.selectedItem-1;
                 }
             }
             draw();
@@ -139,14 +135,14 @@ public:
     }
 
     void moveDown(){
-        if(this->selectedItem < this->getMaxIndex()){
-            this->selectedItem++;
+        if(this->ctx.selectedItem < this->getMaxIndex()){
+            this->ctx.selectedItem++;
             // если курсор совпадает с самым нижним отображающимся элементом
-            if (this->selectedItem == this->getBottomIndex()){
+            if (this->ctx.selectedItem == this->getBottomIndex()){
                 // если после перемещения курсор не стал совпадать с самым последним элементом
-                if (this->selectedItem < this->getMaxIndex()){
+                if (this->ctx.selectedItem < this->getMaxIndex()){
                     //двигаем окно вниз
-                    this->startingIndex++;
+                    this->ctx.startingIndex++;
                 }
             }
             draw();
@@ -156,19 +152,24 @@ public:
     void enter(){
         FileInfo f = getSelectedItem();
         if(f.special && f.name==UPDIR){
-            if(paths.size()){
-                string path = paths.back();
-                paths.pop_back();
-                setCWD(path);
+            if(history.size()){
+                DisplayContext restored = history.back();
+                history.pop_back();
+                setContext(restored);
             }
 
         } else {
-            paths.push_back(getCWD());
+            history.push_back(this->ctx);
             setCWD(f.path);
         }
         draw();
     }
 private:
+    void setContext(DisplayContext newContext){
+        this->setCWD(newContext.cwd);
+        this->ctx.selectedItem = newContext.selectedItem;
+        this->ctx.startingIndex = newContext.startingIndex;
+    }
     string getTypeIcon(FileInfo info) {
 
         if(S_ISDIR(info.stats.st_mode)){
@@ -198,9 +199,9 @@ private:
         u32 offset = 1;
         for (u32 i = 0; i < this->getDisplayHeight() ; ++i) {
             cout << position(i + offset,0);
-            u32 drawingItem = i + this->startingIndex;
+            u32 drawingItem = i + this->ctx.startingIndex;
             cout << BG_DEFAULT << VERTICAL_BORDER;
-            if(drawingItem == this->selectedItem && this->active) {
+            if(drawingItem == this->ctx.selectedItem && this->active) {
                 cout << BG_HIGHLIGHT;
             }
             string filename = "";
@@ -211,7 +212,7 @@ private:
             }
 
             cout << type << this->prepareFilename(filename) << VERTICAL_BORDER << "     ";
-            if(drawingItem == this->selectedItem && this->active) {
+            if(drawingItem == this->ctx.selectedItem && this->active) {
                 cout << BG_DEFAULT;
             }
             cout  << VERTICAL_BORDER;
@@ -246,7 +247,7 @@ private:
 
 
     u32 getBottomIndex(){
-        return this->startingIndex + this->getDisplayHeight() - 1;
+        return this->ctx.startingIndex + this->getDisplayHeight() - 1;
     }
 
     u32 getMaxIndex(){
@@ -256,11 +257,9 @@ private:
 
     PrintConsole printConsole;
     vector<FileInfo> items;
-    vector<string> paths;
+    vector<DisplayContext> history;
     FileInfo updir;
-    u32 selectedItem;
-    u32 startingIndex;
-    string cwd;
+    DisplayContext ctx;
     bool active;
     const int OCCUPIED = 2;
 };
