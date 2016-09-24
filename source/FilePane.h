@@ -12,22 +12,22 @@ class FileManager;
 #include <cstdio>
 #include <dirent.h>
 #include <iostream>
-#include "../3ds_string_utils/source/string_utils.h"
+//#include "../3ds_string_utils/source/string_utils.h"
 #include "FileManager.h"
 
 using namespace std;
 
 #define  UPDIR ".."
-const string VERTICAL_BORDER = {(char)0xB3};
-const string HORIZONTAL_BORDER = {(char)0xC4};
-const string TOP_LEFT_CORNER_BORDER = {(char)0xDA};
-const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
-const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
-const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
-const string UPWARDS_ARROW = {(char)0x18};
-const u8 FILENAME_WIDTH = 16;
-const string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
-const string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
+//const string VERTICAL_BORDER = {(char)0xB3};
+//const string HORIZONTAL_BORDER = {(char)0xC4};
+//const string TOP_LEFT_CORNER_BORDER = {(char)0xDA};
+//const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
+//const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
+//const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
+//const string UPWARDS_ARROW = {(char)0x18};
+//const u8 FILENAME_WIDTH = 16;
+//const string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
+//const string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
 
 typedef struct dirent dirent;
 typedef struct stat s_stat;
@@ -44,7 +44,7 @@ struct DisplayContext{
     u32 startingIndex = 0;
 };
 
-template <class T>
+/*template <class T>
 string to_string (const T& t) {
     std::stringstream ss;
     ss << t;
@@ -116,65 +116,65 @@ vector<FileInfo> list_files(string dir, PrintConsole* printConsole){
         closedir( dp );
     }
     return v;
-}
+}*/
 
 
 class FilePane {
 public:
     FilePane(PrintConsole printConsole, string cwd, FileManager* fm);
 
-    void setActive(bool active);
+    //void setActive(bool active);
 
-    FileInfo getItem(u32 index);
+    //FileInfo getItem(u32 index);
 
-    FileInfo getSelectedItem();
+    //FileInfo getSelectedItem();
 
-    string getCWD();
+    //string getCWD();
 
-    void setCWD(string cwd);
+    //void setCWD(string cwd);
 
-    void moveUp();
+    //void moveUp();
 
-    void moveDown();
+    //void moveDown();
 
-    void moveTop();
+    //void moveTop();
 
-    void moveEnd();
+    //void moveEnd();
 
-    void updir();
+    //void updir();
 
-    void enter();
+    //void enter();
 private:
-    void setContext(DisplayContext newContext);
+    //void setContext(DisplayContext newContext);
 
-    string getSupplementaryInfo(FileInfo info);
+    //string getSupplementaryInfo(FileInfo info);
     
-    string getTypeIcon(FileInfo info);
+    //string getTypeIcon(FileInfo info);
 
-    void drawHeader();
+    //void drawHeader();
 
-    void drawFooter();
+    //void drawFooter();
 
-    void draw();
+    //void draw();
 
-    u32 getDisplayHeight();
+    //u32 getDisplayHeight();
 
-    u32 getDisplayWidth();
+    //u32 getDisplayWidth();
 
-    u32 getBottomIndex();
+    //u32 getBottomIndex();
 
-    u32 getMaxIndex();
+    //u32 getMaxIndex();
 
-    u32 getNumberOfItems();
+    //u32 getNumberOfItems();
 
-    PrintConsole printConsole;
-    vector<FileInfo> items;
-    vector<DisplayContext> history;
-    DisplayContext ctx;
+    //PrintConsole printConsole;
+    //vector<FileInfo> items;
+    //vector<DisplayContext> history;
+    //DisplayContext ctx;
     FileManager* fm;
-    bool active;
+    //bool active;
     // # of lines that occupied by things that are not list of files
-    const int OCCUPIED = 2;
+    //const int OCCUPIED = 2;
 };
 
 

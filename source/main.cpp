@@ -40,7 +40,7 @@ int main(int argc, char **argv)
         u32 kHeld = 0;// hidKeysHeld();
         u32 kDown = hidKeysDown();
         if (kDown & KEY_START) break; // break in order to return to hbmenu
-        fileManager.clock(kDown, kHeld);
+        //fileManager.clock(kDown, kHeld);
         ///
         /// run loop end
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

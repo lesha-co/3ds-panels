@@ -5,10 +5,10 @@
 
 FileManager::FileManager(string cwd_left, string cwd_right){
     setupConsoles();
-    this->l = new FilePane(leftpan, cwd_left, this);
-    this->r = new FilePane(rightpan, cwd_right, this);
-    this->active = l;
-    l->setActive(true);
+    //this->l = new FilePane(leftpan, cwd_left, this);
+    //this->r = new FilePane(rightpan, cwd_right, this);
+    //this->active = l;
+    //l->setActive(true);
 }
 
 FileManager::~FileManager(){
@@ -37,33 +37,33 @@ PrintConsole* FileManager::getBottomConsole(){
     return &bottom;
 }
 
-void FileManager::clock(u32 kDown, u32 kHeld){
-    if ((kHeld | kDown) & KEY_DOWN){
-        active->moveDown();
-    }
-    if ((kHeld | kDown) & KEY_UP){
-        active->moveUp();
-    }
-    if ((kHeld | kDown) & KEY_DLEFT){
-        active->moveTop();
-    }
-    if ((kHeld | kDown) & KEY_DRIGHT){
-        active->moveEnd();
-    }
-    if (kDown & KEY_A){
-        active->enter();
-    }
-    if (kDown & KEY_B){
-        active->updir();
-    }
-    if (kDown & KEY_L){
-        active = l;
-        l->setActive(true);
-        r->setActive(false);
-    }
-    if (kDown & KEY_R){
-        active = r;
-        r->setActive(true);
-        l->setActive(false);
-    }
-}
+//void FileManager::clock(u32 kDown, u32 kHeld){
+//    if ((kHeld | kDown) & KEY_DOWN){
+//        active->moveDown();
+//    }
+//    if ((kHeld | kDown) & KEY_UP){
+//        active->moveUp();
+//    }
+//    if ((kHeld | kDown) & KEY_DLEFT){
+//        active->moveTop();
+//    }
+//    if ((kHeld | kDown) & KEY_DRIGHT){
+//        active->moveEnd();
+//    }
+//    if (kDown & KEY_A){
+//        active->enter();
+//    }
+//    if (kDown & KEY_B){
+//        active->updir();
+//    }
+//    if (kDown & KEY_L){
+//        active = l;
+//        l->setActive(true);
+//        r->setActive(false);
+//    }
+//    if (kDown & KEY_R){
+//        active = r;
+//        r->setActive(true);
+//        l->setActive(false);
+//    }
+//}
