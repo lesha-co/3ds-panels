@@ -26,7 +26,6 @@ int main(int argc, char **argv)
     // init stuff
     chdir("/");
     FileManager fileManager("", "");
-    fileManager.list_files("");
 
     ///
     /// run once end
