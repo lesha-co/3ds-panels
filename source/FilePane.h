@@ -73,7 +73,7 @@ public:
 private:
     void setContext(DisplayContext newContext);
 
-    //string getSupplementaryInfo(FileInfo info);
+    string getSupplementaryInfo(FileInfo info);
     
     //string getTypeIcon(FileInfo info);
 
@@ -85,7 +85,7 @@ private:
 
     u32 getDisplayHeight();
 
-    //u32 getDisplayWidth();
+    u32 getDisplayWidth();
 
     u32 getBottomIndex();
 

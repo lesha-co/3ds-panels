@@ -15,7 +15,7 @@ public:
 
     ~FileManager();
 
-    //void clock(u32 kDown, u32 kHeld);
+    void clock(u32 kDown, u32 kHeld);
 
     PrintConsole* getBottomConsole();
 private:

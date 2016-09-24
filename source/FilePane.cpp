@@ -181,17 +181,17 @@ void FilePane::setContext(DisplayContext newContext){
     this->ctx.startingIndex = newContext.startingIndex;
 }
 //
-//string FilePane::getSupplementaryInfo(FileInfo info){
-//    if(info.special){
-//        if(info.name == UPDIR){
-//            return "UPDIR";
-//        }
-//    }
-//    if(S_ISDIR(info.stats.st_mode)){
-//        return "     ";
-//    }
-//    return getSizeString((u32)info.stats.st_size);
-//}
+string FilePane::getSupplementaryInfo(FileInfo info){
+    if(info.special){
+        if(info.name == UPDIR){
+            return "UPDIR";
+        }
+    }
+    if(S_ISDIR(info.stats.st_mode)){
+        return "     ";
+    }
+    return getSizeString((u32)info.stats.st_size);
+}
 //
 //string FilePane::getTypeIcon(FileInfo info) {
 //
@@ -265,13 +265,13 @@ u32 FilePane::getDisplayHeight(){
     return (u32)ht;
 }
 //
-//u32 FilePane::getDisplayWidth(){
-//    int wt = this->printConsole.windowWidth;
-//    if (wt < 0){
-//        return 0;
-//    }
-//    return (u32)wt;
-//}
+u32 FilePane::getDisplayWidth(){
+    int wt = this->printConsole.windowWidth;
+    if (wt < 0){
+        return 0;
+    }
+    return (u32)wt;
+}
 //
 u32 FilePane::getBottomIndex(){
     return this->ctx.startingIndex + this->getDisplayHeight() - 1;
