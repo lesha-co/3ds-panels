@@ -25,6 +25,14 @@ const string TOP_LEFT_CORNER_BORDER = {(char)0xDA};
 const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
 const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
 const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
+
+const string VERTICAL_BORDER_DOUBLE = {(char)0xBA};
+const string HORIZONTAL_BORDER_DOUBLE = {(char)0xCD};
+const string TOP_LEFT_CORNER_BORDER_DOUBLE = {(char)0xC9};
+const string TOP_RIGHT_CORNER_BORDER_DOUBLE = {(char)0xBB};
+const string BOTTOM_LEFT_CORNER_BORDER_DOUBLE = {(char)0xC8};
+const string BOTTOM_RIGHT_CORNER_BORDER_DOUBLE = {(char)0xBC};
+
 const string UPWARDS_ARROW = {(char)0x18};
 const u8 FILENAME_WIDTH = 16;
 const string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
