@@ -1,19 +1,22 @@
 //
 // Created by lichevsky on 24.09.16.
 //
+#include <unistd.h>
 #include "FileManager.h"
 
 FileManager::FileManager(string cwd_left, string cwd_right){
     setupConsoles();
-    this->l = new FilePane(leftpan, cwd_left, this);
-    this->r = new FilePane(rightpan, cwd_right, this);
+    this->l = new FilePane(leftpan, this);
+    this->r = new FilePane(rightpan, this);
+    this->l->setCWD(cwd_left);
+    this->r->setCWD(cwd_right);
     this->active = l;
     l->setActive(true);
 }
 
 FileManager::~FileManager(){
-    delete l;
-    delete r;
+    free(this->l);
+    free(this->r);
 }
 
 void FileManager::setupConsoles(){
@@ -66,4 +69,37 @@ void FileManager::clock(u32 kDown, u32 kHeld){
         r->setActive(true);
         l->setActive(false);
     }
+}
+
+
+vector<FileInfo> FileManager::list_files(string dir){
+    consoleSelect(&this->bottom);
+    printf("Listing directory %s", dir.c_str());
+    vector<FileInfo> v;
+    if (dir != ""){
+        FileInfo up;
+        up.name = UPDIR;
+        up.special = true;
+        v.push_back(up);
+    }
+    DIR *dp;
+    dirent *dirp;
+
+    dp = opendir(dir.c_str() );
+    if (dp == NULL)
+    {
+        return v;
+    } else {
+        while ((dirp = readdir( dp )))
+        {
+            FileInfo fi;
+            fi.name = dirp->d_name;
+            fi.path = dir + "/" + dirp->d_name;
+            stat( fi.path.c_str(), &fi.stats );
+
+            v.push_back(fi);
+        }
+        closedir( dp );
+    }
+    return v;
 }

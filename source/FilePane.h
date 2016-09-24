@@ -12,42 +12,28 @@ class FileManager;
 #include <cstdio>
 #include <dirent.h>
 #include <iostream>
-//#include "../3ds_string_utils/source/string_utils.h"
+#include "../3ds_string_utils/source/string_utils.h"
 #include "FileManager.h"
+#include "types.h"
 
 using namespace std;
 
 #define  UPDIR ".."
-//const string VERTICAL_BORDER = {(char)0xB3};
-//const string HORIZONTAL_BORDER = {(char)0xC4};
-//const string TOP_LEFT_CORNER_BORDER = {(char)0xDA};
-//const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
-//const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
-//const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
-//const string UPWARDS_ARROW = {(char)0x18};
-//const u8 FILENAME_WIDTH = 16;
-//const string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
-//const string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
-
-typedef struct dirent dirent;
-typedef struct stat s_stat;
-
-struct FileInfo{
-    string name;
-    string path;
-    bool special;
-    s_stat stats;
-};
-struct DisplayContext{
-    string cwd;
-    u32 selectedItem = 0;
-    u32 startingIndex = 0;
-};
+const string VERTICAL_BORDER = {(char)0xB3};
+const string HORIZONTAL_BORDER = {(char)0xC4};
+const string TOP_LEFT_CORNER_BORDER = {(char)0xDA};
+const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
+const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
+const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
+const string UPWARDS_ARROW = {(char)0x18};
+const u8 FILENAME_WIDTH = 16;
+const string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
+const string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
 
 
 class FilePane {
 public:
-    FilePane(PrintConsole printConsole, string cwd, FileManager* fm);
+    FilePane(PrintConsole printConsole, FileManager* fm);
 
     void setActive(bool active);
 
@@ -75,13 +61,13 @@ private:
 
     string getSupplementaryInfo(FileInfo info);
     
-    //string getTypeIcon(FileInfo info);
+    string getTypeIcon(FileInfo info);
 
-    //void drawHeader();
+    void drawHeader();
 
-    //void drawFooter();
+    void drawFooter();
 
-    //void draw();
+    void draw();
 
     u32 getDisplayHeight();
 

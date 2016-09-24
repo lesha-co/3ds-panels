@@ -5,6 +5,7 @@
 #ifndef MAIN_EXEC_FILEMANAGER_H
 #define MAIN_EXEC_FILEMANAGER_H
 #include <string>
+#include "types.h"
 class FilePane;
 #include "FilePane.h"
 using namespace std;
@@ -18,6 +19,8 @@ public:
     void clock(u32 kDown, u32 kHeld);
 
     PrintConsole* getBottomConsole();
+
+    vector<FileInfo> list_files(string dir);
 private:
     void setupConsoles();
 
