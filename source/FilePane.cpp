@@ -180,27 +180,30 @@ string FilePane::getTypeIcon(FileInfo info) {
     return " ";
 }
 //
-void FilePane::drawHeader() {
-    string b = {HORIZONTAL_BORDER};
-    cout << TOP_LEFT_CORNER_BORDER << repeat(b , getDisplayWidth()-2) << TOP_RIGHT_CORNER_BORDER;
+
+void FilePane::drawHeader(BorderSet borderSet, u32 width) {
+    std::string b = {borderSet.HORIZONTAL};
+    cout << borderSet.TOP_LEFT_CORNER << repeat(b , width-2) << borderSet.TOP_RIGHT_CORNER;
 }
 
-void FilePane::drawFooter() {
-    string b = {HORIZONTAL_BORDER};
-    cout << BOTTOM_LEFT_CORNER_BORDER << repeat(b , getDisplayWidth()-2) << BOTTOM_RIGHT_CORNER_BORDER;
+void FilePane::drawFooter(BorderSet borderSet, u32 width) {
+    std::string b = {borderSet.HORIZONTAL};
+    cout << borderSet.BOTTOM_LEFT_CORNER << repeat(b , width-2) << borderSet.BOTTOM_RIGHT_CORNER;
 }
 //
 void FilePane::draw(){
 
     consoleSelect(&this->printConsole);
     cout << position(0,0) << BG_DEFAULT;
-    drawHeader();
+    BorderSet borderSet = border_single;
+    u32 width = getDisplayWidth();
+    drawHeader(borderSet, width);
     // number of lines we need to skip from the top of under_panels ( top border in this case)
     u32 offset = 1;
     for (u32 i = 0; i < this->getDisplayHeight() ; ++i) {
         cout << position(i + offset,0);
         u32 drawingItem = i + this->ctx.startingIndex;
-        cout << BG_DEFAULT << VERTICAL_BORDER;
+        cout << BG_DEFAULT << borderSet.VERTICAL;
         bool is_selected = (drawingItem == this->ctx.selectedItem && this->active);
         if(is_selected) {
             cout << BG_HIGHLIGHT;
@@ -221,14 +224,14 @@ void FilePane::draw(){
             supplementary = getSupplementaryInfo(this->getItem(drawingItem)).substr(0,5);
         }
 
-        cout << type << leftpad(filename, FILENAME_WIDTH) << VERTICAL_BORDER << rightpad(supplementary, 5);
+        cout << type << leftpad(filename, FILENAME_WIDTH) << borderSet.VERTICAL << rightpad(supplementary, 5);
         if(is_selected) {
             cout << BG_DEFAULT;
         }
-        cout  << VERTICAL_BORDER;
+        cout  << borderSet.VERTICAL;
     }
     cout << position(getDisplayHeight() + offset,0) << BG_DEFAULT;
-    drawFooter();
+    drawFooter(borderSet, width );
 }
 
 u32 FilePane::getDisplayHeight(){

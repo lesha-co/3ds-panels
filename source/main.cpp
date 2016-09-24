@@ -4,8 +4,7 @@
 #include "FileManager.h"
 
 using namespace std;
-void drawASCII(PrintConsole* console){
-    consoleSelect(console);
+void drawASCII(){
     for (int i = 0; i < 256; ++i) {
         if( i%16 == 0) {
             printf("\n %3x |", i);

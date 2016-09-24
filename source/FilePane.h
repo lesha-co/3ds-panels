@@ -15,23 +15,18 @@ class FileManager;
 #include "../3ds_string_utils/source/string_utils.h"
 #include "FileManager.h"
 #include "types.h"
+#include "drawing.h"
 
 using namespace std;
 
 #define  UPDIR ".."
-const string VERTICAL_BORDER = {(char)0xB3};
-const string HORIZONTAL_BORDER = {(char)0xC4};
-const string TOP_LEFT_CORNER_BORDER = {(char)0xDA};
-const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
-const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
-const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
+//const string VERTICAL_BORDER = {(char)0xB3};
+//const string HORIZONTAL_BORDER = {(char)0xC4};
+//const string TOP_LEFT_CORNER_BORDER = {(char)0xDA};
+//const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
+//const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
+//const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
 
-const string VERTICAL_BORDER_DOUBLE = {(char)0xBA};
-const string HORIZONTAL_BORDER_DOUBLE = {(char)0xCD};
-const string TOP_LEFT_CORNER_BORDER_DOUBLE = {(char)0xC9};
-const string TOP_RIGHT_CORNER_BORDER_DOUBLE = {(char)0xBB};
-const string BOTTOM_LEFT_CORNER_BORDER_DOUBLE = {(char)0xC8};
-const string BOTTOM_RIGHT_CORNER_BORDER_DOUBLE = {(char)0xBC};
 
 const string UPWARDS_ARROW = {(char)0x18};
 const u8 FILENAME_WIDTH = 16;
@@ -77,9 +72,9 @@ private:
     
     string getTypeIcon(FileInfo info);
 
-    void drawHeader();
+    void drawHeader(BorderSet borderSet, u32 width);
 
-    void drawFooter();
+    void drawFooter(BorderSet borderSet, u32 width);
 
     void draw();
 
