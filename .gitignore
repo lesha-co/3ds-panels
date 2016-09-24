@@ -3,3 +3,5 @@ build/
 *.3dsx
 *.elf
 *.smdh
+CMakeLists.txt
+*.*~
