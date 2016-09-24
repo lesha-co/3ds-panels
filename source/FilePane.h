@@ -43,8 +43,6 @@ public:
 
     string getCWD();
 
-    void setCWD(string cwd);
-
     void moveUp();
 
     void moveDown();
@@ -56,8 +54,12 @@ public:
     void updir();
 
     void enter();
+
+    void setContext(string cwd);
 private:
     void setContext(DisplayContext newContext);
+
+    void setContext(string cwd, u32 selectedItem, u32 startingIndex);
 
     string getSupplementaryInfo(FileInfo info);
     

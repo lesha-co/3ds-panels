@@ -21,6 +21,8 @@ public:
     PrintConsole* getBottomConsole();
 
     vector<FileInfo> list_files(string dir);
+
+    void onCWDUpdate(FilePane* pane);
 private:
     void setupConsoles();
 

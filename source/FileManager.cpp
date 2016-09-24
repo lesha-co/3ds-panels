@@ -8,10 +8,11 @@ FileManager::FileManager(string cwd_left, string cwd_right){
     setupConsoles();
     this->l = new FilePane(leftpan, this);
     this->r = new FilePane(rightpan, this);
-    this->l->setCWD(cwd_left);
-    this->r->setCWD(cwd_right);
+    this->l->setContext(cwd_left);
+    this->r->setContext(cwd_right);
     this->active = l;
     l->setActive(true);
+    this->onCWDUpdate(active);
 }
 
 FileManager::~FileManager(){
@@ -26,14 +27,27 @@ void FileManager::setupConsoles(){
     consoleInit(GFX_TOP, &rightpan);
     consoleInit(GFX_TOP, &under_panels);
     consoleInit(GFX_TOP, &actions);
-    consoleInit(GFX_TOP, &context);
     //                                x   y   w   h
     consoleSetWindow(&menu,           0,  0, 50,  1);
     consoleSetWindow(&leftpan,        0,  1, 25, 26);
     consoleSetWindow(&rightpan,      25,  1, 25, 26);
     consoleSetWindow(&under_panels,   0, 27, 50,  2);
     consoleSetWindow(&actions,        0, 29, 50,  1);
-    consoleSetWindow(&context,        5,  1, 20, 20);
+
+
+    consoleSelect(&bottom);
+    cout << BG_DEFAULT;
+    consoleClear();
+    consoleSelect(&menu);
+    cout << BG_DEFAULT;
+    consoleClear();
+    cout << "menu";
+
+    consoleSelect(&actions);
+    cout << BG_DEFAULT;
+    consoleClear();
+    cout << "actions";
+
 }
 
 PrintConsole* FileManager::getBottomConsole(){
@@ -63,11 +77,13 @@ void FileManager::clock(u32 kDown, u32 kHeld){
         active = l;
         l->setActive(true);
         r->setActive(false);
+        this->onCWDUpdate(active);
     }
     if (kDown & KEY_R){
         active = r;
         r->setActive(true);
         l->setActive(false);
+        this->onCWDUpdate(active);
     }
 }
 
@@ -102,4 +118,15 @@ vector<FileInfo> FileManager::list_files(string dir){
         closedir( dp );
     }
     return v;
+}
+void FileManager::onCWDUpdate(FilePane* pane){
+    if (pane == this->active){
+        consoleSelect(&this->under_panels);
+        cout << BG_DEFAULT;
+        consoleClear();
+        string cwd = pane->getCWD();
+        if(cwd == "")
+            cwd = "/";
+        cout << cwd;
+    }
 }

@@ -48,7 +48,6 @@ string repeat(string in, u32 times){
 FilePane::FilePane(PrintConsole printConsole, FileManager* fm) {
     this->printConsole = printConsole;
     this->active = false;
-    //this->draw();
     this->fm = fm;
 }
 
@@ -68,14 +67,6 @@ FileInfo FilePane::getSelectedItem() {
 
 string FilePane::getCWD() {
     return this->ctx.cwd;
-}
-
-void FilePane::setCWD(string cwd) {
-    this->ctx.cwd = cwd;
-    this->items = fm->list_files(cwd);
-    this->ctx.selectedItem = 0;
-    this->ctx.startingIndex = 0;
-    draw();
 }
 
 void FilePane::moveUp(){
@@ -138,7 +129,7 @@ void FilePane::enter(){
     } else {
         if(S_ISDIR(f.stats.st_mode)){
             history.push_back(this->ctx);
-            setCWD(f.path);
+            setContext(f.path, 0, 0);
 
         }
 
@@ -146,9 +137,22 @@ void FilePane::enter(){
 }
 //
 void FilePane::setContext(DisplayContext newContext){
-    this->setCWD(newContext.cwd);
+    this->ctx.cwd = newContext.cwd;
+    this->items = fm->list_files(newContext.cwd);
     this->ctx.selectedItem = newContext.selectedItem;
     this->ctx.startingIndex = newContext.startingIndex;
+    fm->onCWDUpdate(this);
+    draw();
+}
+void FilePane::setContext(string cwd, u32 selectedItem, u32 startingIndex){
+    DisplayContext context;
+    context.cwd = cwd;
+    context.selectedItem = selectedItem;
+    context.startingIndex = startingIndex;
+    setContext(context);
+}
+void FilePane::setContext(string cwd){
+    setContext(cwd, 0, 0);
 }
 //
 string FilePane::getSupplementaryInfo(FileInfo info){
