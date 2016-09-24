@@ -29,13 +29,28 @@ void FileManager::setupConsoles(){
     consoleInit(GFX_TOP, &under_panels);
     consoleInit(GFX_TOP, &actions);
     consoleInit(GFX_TOP, &prompt);
+    consoleInit(GFX_TOP, &prompt_body);
     //                                x   y   w   h
     consoleSetWindow(&menu,           0,  0, 50,  1);
     consoleSetWindow(&leftpan,        0,  1, 25, 26);
     consoleSetWindow(&rightpan,      25,  1, 25, 26);
     consoleSetWindow(&under_panels,   0, 27, 50,  2);
     consoleSetWindow(&actions,        0, 29, 50,  1);
-    consoleSetWindow(&prompt, 5, 2, 50 - 10, 30 - 4);
+
+    u8 prompt_horizontal_margin = 5;
+    u8 prompt_vertical_margin = 2;
+    u8 prompt_horizontal_padding = 2;
+    u8 prompt_vertical_padding = 2;
+    consoleSetWindow(&prompt,
+                     prompt_horizontal_margin,
+                     prompt_vertical_margin,
+                     50 - prompt_horizontal_margin*2,
+                     30 - prompt_vertical_margin*2);
+    consoleSetWindow(&prompt_body,
+                     prompt_horizontal_margin+prompt_horizontal_padding,
+                     prompt_vertical_margin+prompt_vertical_padding,
+                     50 - (prompt_horizontal_margin + prompt_horizontal_padding)*2,
+                     30 - (prompt_vertical_margin + prompt_vertical_padding)*2);
 
 
     consoleSelect(&bottom);
@@ -65,6 +80,9 @@ void FileManager::setmode(DisplayMode_t mode){
     switch(this->mode){
         case MODE_PROMPT_DELETE: {
             consoleSelect(&prompt);
+            cout << BG_PROMPT;
+            consoleClear();
+            consoleSelect(&prompt_body);
             cout << BG_PROMPT;
             consoleClear();
             string name = active->getSelectedItem().name;

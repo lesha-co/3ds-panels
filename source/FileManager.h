@@ -31,7 +31,8 @@ private:
     FilePane* l;
     FilePane* r;
     FilePane* active;
-    PrintConsole menu, leftpan, rightpan, under_panels, actions, bottom, prompt;
+    PrintConsole menu, leftpan, rightpan, under_panels, actions, bottom,
+        prompt, prompt_body;
     DisplayMode_t mode;
 
     void setmode(DisplayMode_t mode);
