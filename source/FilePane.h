@@ -44,108 +44,34 @@ struct DisplayContext{
     u32 startingIndex = 0;
 };
 
-/*template <class T>
-string to_string (const T& t) {
-    std::stringstream ss;
-    ss << t;
-    return ss.str();
-}
-string getSizeString(u32 size){
-    string prefixes[5] = {"","K","M","G","T"};
-    u8 idx = 0;
-    while(size >= 1024){
-        idx++;
-        size /= 1024;
-    }
-    if (idx>4){
-        return "!";
-    } else {
-        return to_string(size)+prefixes[idx];
-    }
-}
-string leftpad(string s, u32 width){
-    string s1 = s.substr(0, width);
-    while (s1.length() < width){
-        s1+=" ";
-    }
-    return s1;
-}
-string rightpad(string s, u32 width){
-    string s1 = s.substr(0, width);
-    while (s1.length() < width){
-        s1=" "+s1;
-    }
-    return s1;
-}
-
-string repeat(string in, u32 times){
-    string s = "";
-    for (u32 i = 0; i < times; ++i) {
-        s += in;
-    }
-    return s;
-}
-
-vector<FileInfo> list_files(string dir, PrintConsole* printConsole){
-    vector<FileInfo> v;
-    consoleInit(GFX_BOTTOM, printConsole);
-    printf("Listing dir %s", dir.c_str());
-    if (dir != ""){
-        FileInfo up;
-        up.name = UPDIR;
-        up.special = true;
-        v.push_back(up);
-    }
-    DIR *dp;
-    dirent *dirp;
-
-    dp = opendir(dir.c_str() );
-    if (dp == NULL)
-    {
-        return v;
-    } else {
-        while ((dirp = readdir( dp )))
-        {
-            FileInfo fi;
-            fi.name = dirp->d_name;
-            fi.path = dir + "/" + dirp->d_name;
-            stat( fi.path.c_str(), &fi.stats );
-
-            v.push_back(fi);
-        }
-        closedir( dp );
-    }
-    return v;
-}*/
-
 
 class FilePane {
 public:
     FilePane(PrintConsole printConsole, string cwd, FileManager* fm);
 
-    //void setActive(bool active);
+    void setActive(bool active);
 
-    //FileInfo getItem(u32 index);
+    FileInfo getItem(u32 index);
 
-    //FileInfo getSelectedItem();
+    FileInfo getSelectedItem();
 
-    //string getCWD();
+    string getCWD();
 
-    //void setCWD(string cwd);
+    void setCWD(string cwd);
 
-    //void moveUp();
+    void moveUp();
 
-    //void moveDown();
+    void moveDown();
 
-    //void moveTop();
+    void moveTop();
 
-    //void moveEnd();
+    void moveEnd();
 
-    //void updir();
+    void updir();
 
-    //void enter();
+    void enter();
 private:
-    //void setContext(DisplayContext newContext);
+    void setContext(DisplayContext newContext);
 
     //string getSupplementaryInfo(FileInfo info);
     
@@ -157,24 +83,24 @@ private:
 
     //void draw();
 
-    //u32 getDisplayHeight();
+    u32 getDisplayHeight();
 
     //u32 getDisplayWidth();
 
-    //u32 getBottomIndex();
+    u32 getBottomIndex();
 
-    //u32 getMaxIndex();
+    u32 getMaxIndex();
 
-    //u32 getNumberOfItems();
+    u32 getNumberOfItems();
 
-    //PrintConsole printConsole;
-    //vector<FileInfo> items;
-    //vector<DisplayContext> history;
-    //DisplayContext ctx;
+    PrintConsole printConsole;
+    vector<FileInfo> items;
+    vector<DisplayContext> history;
+    DisplayContext ctx;
     FileManager* fm;
-    //bool active;
+    bool active;
     // # of lines that occupied by things that are not list of files
-    //const int OCCUPIED = 2;
+    const int OCCUPIED = 2;
 };
 
 

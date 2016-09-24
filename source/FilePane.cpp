@@ -2,6 +2,78 @@
 // Created by lichevsky on 24.09.16.
 //
 #include "FilePane.h"
+template <class T>
+string to_string (const T& t) {
+    std::stringstream ss;
+    ss << t;
+    return ss.str();
+}
+string getSizeString(u32 size){
+    string prefixes[5] = {"","K","M","G","T"};
+    u8 idx = 0;
+    while(size >= 1024){
+        idx++;
+        size /= 1024;
+    }
+    if (idx>4){
+        return "!";
+    } else {
+        return to_string(size)+prefixes[idx];
+    }
+}
+string leftpad(string s, u32 width){
+    string s1 = s.substr(0, width);
+    while (s1.length() < width){
+        s1+=" ";
+    }
+    return s1;
+}
+string rightpad(string s, u32 width){
+    string s1 = s.substr(0, width);
+    while (s1.length() < width){
+        s1=" "+s1;
+    }
+    return s1;
+}
+
+string repeat(string in, u32 times){
+    string s = "";
+    for (u32 i = 0; i < times; ++i) {
+        s += in;
+    }
+    return s;
+}
+vector<FileInfo> list_files(string dir, PrintConsole* printConsole){
+    vector<FileInfo> v;
+    consoleInit(GFX_BOTTOM, printConsole);
+    printf("Listing dir %s", dir.c_str());
+    if (dir != ""){
+        FileInfo up;
+        up.name = UPDIR;
+        up.special = true;
+        v.push_back(up);
+    }
+    DIR *dp;
+    dirent *dirp;
+
+    dp = opendir(dir.c_str() );
+    if (dp == NULL)
+    {
+        return v;
+    } else {
+        while ((dirp = readdir( dp )))
+        {
+            FileInfo fi;
+            fi.name = dirp->d_name;
+            fi.path = dir + "/" + dirp->d_name;
+            stat( fi.path.c_str(), &fi.stats );
+
+            v.push_back(fi);
+        }
+        closedir( dp );
+    }
+    return v;
+}
 
 FilePane::FilePane(PrintConsole printConsole, string cwd, FileManager* fm) {
     //this->printConsole = printConsole;
@@ -11,103 +83,103 @@ FilePane::FilePane(PrintConsole printConsole, string cwd, FileManager* fm) {
     this->fm = fm;
 }
 
-//void FilePane::setActive(bool active){
-//    this->active = active;
-//    draw();
-//}
+void FilePane::setActive(bool active){
+    this->active = active;
+    //draw();
+}
 
-//FileInfo FilePane::getItem(u32 index) {
-//    return this->items[index];
-//
-//}
+FileInfo FilePane::getItem(u32 index) {
+    return this->items[index];
 
-//FileInfo FilePane::getSelectedItem() {
-//    return getItem(this->ctx.selectedItem);
-//}
+}
 
-//string FilePane::getCWD() {
-//    return this->ctx.cwd;
-//}
+FileInfo FilePane::getSelectedItem() {
+    return getItem(this->ctx.selectedItem);
+}
 
-//void FilePane::setCWD(string cwd) {
-//    this->ctx.cwd = cwd;
-//    this->items = list_files(cwd, fm->getBottomConsole());
-//    this->ctx.selectedItem = 0;
-//    this->ctx.startingIndex = 0;
-//}
+string FilePane::getCWD() {
+    return this->ctx.cwd;
+}
 
-//void FilePane::moveUp(){
-//    if(this->ctx.selectedItem > 0){
-//        this->ctx.selectedItem--;
-//        // если курсор совпадает с самым верхним отображающимся элементом
-//        if (this->ctx.selectedItem == this->ctx.startingIndex){
-//            // если после перемещения курсор не стал совпадать с самым первым элементом
-//            if (this->ctx.selectedItem > 0){
-//                //двигаем окно вверх
-//                this->ctx.startingIndex = this->ctx.selectedItem-1;
-//            }
-//        }
-//        draw();
-//    }
-//}
+void FilePane::setCWD(string cwd) {
+    this->ctx.cwd = cwd;
+    this->items = list_files(cwd, fm->getBottomConsole());
+    this->ctx.selectedItem = 0;
+    this->ctx.startingIndex = 0;
+}
+
+void FilePane::moveUp(){
+    if(this->ctx.selectedItem > 0){
+        this->ctx.selectedItem--;
+        // если курсор совпадает с самым верхним отображающимся элементом
+        if (this->ctx.selectedItem == this->ctx.startingIndex){
+            // если после перемещения курсор не стал совпадать с самым первым элементом
+            if (this->ctx.selectedItem > 0){
+                //двигаем окно вверх
+                this->ctx.startingIndex = this->ctx.selectedItem-1;
+            }
+        }
+        //draw();
+    }
+}
+
+void FilePane::moveDown(){
+    if(this->ctx.selectedItem < this->getMaxIndex()){
+        this->ctx.selectedItem++;
+        // если курсор совпадает с самым нижним отображающимся элементом
+        if (this->ctx.selectedItem == this->getBottomIndex()){
+            // если после перемещения курсор не стал совпадать с самым последним элементом
+            if (this->ctx.selectedItem < this->getMaxIndex()){
+                //двигаем окно вниз
+                this->ctx.startingIndex++;
+            }
+        }
+        //draw();
+    }
+}
+
+void FilePane::moveTop(){
+    this->ctx.selectedItem = 0;
+    this->ctx.startingIndex = 0;
+    //draw();
+}
+void FilePane::moveEnd(){
+    this->ctx.selectedItem = this->getMaxIndex();
+    if (this->getNumberOfItems() < this->getDisplayHeight()){
+        this->ctx.startingIndex = 0;
+    } else {
+        this->ctx.startingIndex = this->ctx.selectedItem - this->getDisplayHeight() + 1;
+    }
+
+    //draw();
+}
+void FilePane::updir(){
+    if(history.size()){
+        DisplayContext restored = history.back();
+        history.pop_back();
+        setContext(restored);
+        //draw();
+    }
+}
+void FilePane::enter(){
+    FileInfo f = getSelectedItem();
+    if(f.special && f.name==UPDIR){
+        updir();
+    } else {
+        if(S_ISDIR(f.stats.st_mode)){
+            history.push_back(this->ctx);
+            setCWD(f.path);
+            //draw();
+        }
+
+    }
+}
 //
-//void FilePane::moveDown(){
-//    if(this->ctx.selectedItem < this->getMaxIndex()){
-//        this->ctx.selectedItem++;
-//        // если курсор совпадает с самым нижним отображающимся элементом
-//        if (this->ctx.selectedItem == this->getBottomIndex()){
-//            // если после перемещения курсор не стал совпадать с самым последним элементом
-//            if (this->ctx.selectedItem < this->getMaxIndex()){
-//                //двигаем окно вниз
-//                this->ctx.startingIndex++;
-//            }
-//        }
-//        draw();
-//    }
-//}
-//
-//void FilePane::moveTop(){
-//    this->ctx.selectedItem = 0;
-//    this->ctx.startingIndex = 0;
-//    draw();
-//}
-//void FilePane::moveEnd(){
-//    this->ctx.selectedItem = this->getMaxIndex();
-//    if (this->getNumberOfItems() < this->getDisplayHeight()){
-//        this->ctx.startingIndex = 0;
-//    } else {
-//        this->ctx.startingIndex = this->ctx.selectedItem - this->getDisplayHeight() + 1;
-//    }
-//
-//    draw();
-//}
-//void FilePane::updir(){
-//    if(history.size()){
-//        DisplayContext restored = history.back();
-//        history.pop_back();
-//        setContext(restored);
-//        draw();
-//    }
-//}
-//void FilePane::enter(){
-//    FileInfo f = getSelectedItem();
-//    if(f.special && f.name==UPDIR){
-//        updir();
-//    } else {
-//        if(S_ISDIR(f.stats.st_mode)){
-//            history.push_back(this->ctx);
-//            setCWD(f.path);
-//            draw();
-//        }
-//
-//    }
-//}
-//
-//void FilePane::setContext(DisplayContext newContext){
-//    this->setCWD(newContext.cwd);
-//    this->ctx.selectedItem = newContext.selectedItem;
-//    this->ctx.startingIndex = newContext.startingIndex;
-//}
+void FilePane::setContext(DisplayContext newContext){
+    this->setCWD(newContext.cwd);
+    this->ctx.selectedItem = newContext.selectedItem;
+    this->ctx.startingIndex = newContext.startingIndex;
+}
 //
 //string FilePane::getSupplementaryInfo(FileInfo info){
 //    if(info.special){
@@ -185,13 +257,13 @@ FilePane::FilePane(PrintConsole printConsole, string cwd, FileManager* fm) {
 //    drawFooter();
 //}
 
-//u32 FilePane::getDisplayHeight(){
-//    int ht = this->printConsole.windowHeight - OCCUPIED;
-//    if (ht < OCCUPIED){
-//        return 0;
-//    }
-//    return (u32)ht;
-//}
+u32 FilePane::getDisplayHeight(){
+    int ht = this->printConsole.windowHeight - OCCUPIED;
+    if (ht < OCCUPIED){
+        return 0;
+    }
+    return (u32)ht;
+}
 //
 //u32 FilePane::getDisplayWidth(){
 //    int wt = this->printConsole.windowWidth;
@@ -201,14 +273,14 @@ FilePane::FilePane(PrintConsole printConsole, string cwd, FileManager* fm) {
 //    return (u32)wt;
 //}
 //
-//u32 FilePane::getBottomIndex(){
-//    return this->ctx.startingIndex + this->getDisplayHeight() - 1;
-//}
+u32 FilePane::getBottomIndex(){
+    return this->ctx.startingIndex + this->getDisplayHeight() - 1;
+}
 //
-//u32 FilePane::getMaxIndex(){
-//    return getNumberOfItems()-1;
-//}
+u32 FilePane::getMaxIndex(){
+    return getNumberOfItems()-1;
+}
 //
-//u32 FilePane::getNumberOfItems(){
-//    return items.size();
-//}
+u32 FilePane::getNumberOfItems(){
+    return items.size();
+}
