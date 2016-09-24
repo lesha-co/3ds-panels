@@ -23,13 +23,18 @@ public:
     vector<FileInfo> list_files(string dir);
 
     void onCWDUpdate(FilePane* pane);
+
+    void DeleteFile(string path);
 private:
     void setupConsoles();
 
     FilePane* l;
     FilePane* r;
     FilePane* active;
-    PrintConsole menu, leftpan, rightpan, under_panels, actions, context, bottom;
+    PrintConsole menu, leftpan, rightpan, under_panels, actions, bottom, prompt;
+    DisplayMode_t mode;
+
+    void setmode(DisplayMode_t mode);
 };
 
 

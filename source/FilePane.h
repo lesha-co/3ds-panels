@@ -29,6 +29,7 @@ const string UPWARDS_ARROW = {(char)0x18};
 const u8 FILENAME_WIDTH = 16;
 const string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
 const string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
+const string BG_PROMPT = setColor(COLOR_WHITE, COLOR_RED);
 
 
 class FilePane {
@@ -56,6 +57,9 @@ public:
     void enter();
 
     void setContext(string cwd);
+
+    void redraw();
+
 private:
     void setContext(DisplayContext newContext);
 

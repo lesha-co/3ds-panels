@@ -22,4 +22,9 @@ struct DisplayContext{
     u32 selectedItem = 0;
     u32 startingIndex = 0;
 };
+
+enum DisplayMode_t{
+    MODE_NORMAL = 0,
+    MODE_PROMPT_DELETE = 1
+};
 #endif //MAIN_EXEC_TYPES_H

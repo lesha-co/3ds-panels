@@ -258,3 +258,21 @@ u32 FilePane::getMaxIndex(){
 u32 FilePane::getNumberOfItems(){
     return items.size();
 }
+
+void FilePane::redraw() {
+    u32 selected = this->ctx.selectedItem;
+    u32 starting = this->ctx.startingIndex;
+    u32 oldLength = this->getNumberOfItems();
+    this->items = fm->list_files(this->ctx.cwd);
+    if(this->getNumberOfItems() < oldLength){
+        if(selected > getMaxIndex()){
+            selected = getMaxIndex();
+        }
+        if(starting>0){
+            starting--;
+        }
+    }
+    this->ctx.startingIndex = starting;
+    this->ctx.selectedItem = selected;
+    draw();
+}
