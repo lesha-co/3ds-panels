@@ -4,16 +4,19 @@
 
 #ifndef MAIN_EXEC_FILEPANE_H
 #define MAIN_EXEC_FILEPANE_H
-
-#include <fstream>
+class FileManager;
 #include <3ds.h>
-#include <iostream>
-#include <dirent.h>
 #include <string>
 #include <vector>
-#include <sys/stat.h>
 #include <sstream>
-#include "common.h"
+#include <cstdio>
+#include <dirent.h>
+#include <iostream>
+#include "../3ds_string_utils/source/string_utils.h"
+#include "FileManager.h"
+
+using namespace std;
+
 #define  UPDIR ".."
 const string VERTICAL_BORDER = {(char)0xB3};
 const string HORIZONTAL_BORDER = {(char)0xC4};
@@ -22,25 +25,13 @@ const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
 const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
 const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
 const string UPWARDS_ARROW = {(char)0x18};
+const u8 FILENAME_WIDTH = 16;
 const string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
 const string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
-template <class T>
-inline string to_string (const T& t) {
-    std::stringstream ss;
-    ss << t;
-    return ss.str();
-}
-inline string repeat(string in, u32 times){
-    string s = "";
-    for (u32 i = 0; i < times; ++i) {
-        s += in;
-    }
-    return s;
-}
-using namespace std;
+
 typedef struct dirent dirent;
 typedef struct stat s_stat;
-const u8 FILENAME_WIDTH = 16;
+
 struct FileInfo{
     string name;
     string path;
@@ -52,9 +43,52 @@ struct DisplayContext{
     u32 selectedItem = 0;
     u32 startingIndex = 0;
 };
-vector<FileInfo> list_files(string dir){
+
+template <class T>
+string to_string (const T& t) {
+    std::stringstream ss;
+    ss << t;
+    return ss.str();
+}
+string getSizeString(u32 size){
+    string prefixes[5] = {"","K","M","G","T"};
+    u8 idx = 0;
+    while(size >= 1024){
+        idx++;
+        size /= 1024;
+    }
+    if (idx>4){
+        return "!";
+    } else {
+        return to_string(size)+prefixes[idx];
+    }
+}
+string leftpad(string s, u32 width){
+    string s1 = s.substr(0, width);
+    while (s1.length() < width){
+        s1+=" ";
+    }
+    return s1;
+}
+string rightpad(string s, u32 width){
+    string s1 = s.substr(0, width);
+    while (s1.length() < width){
+        s1=" "+s1;
+    }
+    return s1;
+}
+
+string repeat(string in, u32 times){
+    string s = "";
+    for (u32 i = 0; i < times; ++i) {
+        s += in;
+    }
+    return s;
+}
+
+vector<FileInfo> list_files(string dir, PrintConsole* printConsole){
     vector<FileInfo> v;
-    consoleInit(GFX_BOTTOM, &bottom);
+    consoleInit(GFX_BOTTOM, printConsole);
     printf("Listing dir %s", dir.c_str());
     if (dir != ""){
         FileInfo up;
@@ -86,211 +120,58 @@ vector<FileInfo> list_files(string dir){
 
 
 class FilePane {
-    // special case:
-    // index 0 represents UP-DIR (..)
-    // index X represents items[X-1]
 public:
-    FilePane(PrintConsole printConsole, string cwd) {
-        this->printConsole = printConsole;
-        this->active = false;
-        this->setCWD(cwd);
-        this->draw();
-    }
+    FilePane(PrintConsole printConsole, string cwd, FileManager* fm);
 
-    void setActive(bool active){
-        this->active = active;
-        draw();
-    }
+    void setActive(bool active);
 
+    FileInfo getItem(u32 index);
 
-    FileInfo getItem(u32 index) {
-        return this->items[index];
+    FileInfo getSelectedItem();
 
-    }
+    string getCWD();
 
-    FileInfo getSelectedItem() {
-        return getItem(this->ctx.selectedItem);
-    }
+    void setCWD(string cwd);
 
-    string getCWD() {
-        return this->ctx.cwd;
-    }
+    void moveUp();
 
-    void setCWD(string cwd) {
-        this->ctx.cwd = cwd;
-        this->items = list_files(cwd);
-        this->ctx.selectedItem = 0;
-        this->ctx.startingIndex = 0;
-    }
+    void moveDown();
 
-    void moveUp(){
-        if(this->ctx.selectedItem > 0){
-            this->ctx.selectedItem--;
-            // если курсор совпадает с самым верхним отображающимся элементом
-            if (this->ctx.selectedItem == this->ctx.startingIndex){
-                // если после перемещения курсор не стал совпадать с самым первым элементом
-                if (this->ctx.selectedItem > 0){
-                    //двигаем окно вверх
-                    this->ctx.startingIndex = this->ctx.selectedItem-1;
-                }
-            }
-            draw();
-        }
-    }
+    void moveTop();
 
-    void moveDown(){
-        if(this->ctx.selectedItem < this->getMaxIndex()){
-            this->ctx.selectedItem++;
-            // если курсор совпадает с самым нижним отображающимся элементом
-            if (this->ctx.selectedItem == this->getBottomIndex()){
-                // если после перемещения курсор не стал совпадать с самым последним элементом
-                if (this->ctx.selectedItem < this->getMaxIndex()){
-                    //двигаем окно вниз
-                    this->ctx.startingIndex++;
-                }
-            }
-            draw();
-        }
-    }
+    void moveEnd();
 
-    void moveTop(){
-        this->ctx.selectedItem = 0;
-        this->ctx.startingIndex = 0;
-        draw();
-    }
-    void moveEnd(){
-        this->ctx.selectedItem = this->getMaxIndex();
-        if (this->getNumberOfItems() < this->getDisplayHeight()){
-            this->ctx.startingIndex = 0;
-        } else {
-            this->ctx.startingIndex = this->ctx.selectedItem - this->getDisplayHeight() + 1;
-        }
+    void updir();
 
-        draw();
-    }
-    void updir(){
-        if(history.size()){
-            DisplayContext restored = history.back();
-            history.pop_back();
-            setContext(restored);
-            draw();
-        }
-    }
-    void enter(){
-        FileInfo f = getSelectedItem();
-        if(f.special && f.name==UPDIR){
-            updir();
-        } else {
-            if(S_ISDIR(f.stats.st_mode)){
-                history.push_back(this->ctx);
-                setCWD(f.path);
-                draw();
-            }
-
-        }
-    }
+    void enter();
 private:
-    void setContext(DisplayContext newContext){
-        this->setCWD(newContext.cwd);
-        this->ctx.selectedItem = newContext.selectedItem;
-        this->ctx.startingIndex = newContext.startingIndex;
-    }
-    string getTypeIcon(FileInfo info) {
+    void setContext(DisplayContext newContext);
 
-        if(info.special){
-            if(info.name == UPDIR){
-                return UPWARDS_ARROW;
-            }
-        }
-        if(S_ISDIR(info.stats.st_mode)){
-            return "/";
-        }
-        return " ";
-    }
+    string getSupplementaryInfo(FileInfo info);
+    
+    string getTypeIcon(FileInfo info);
 
-    void drawHeader() {
-        string b = {HORIZONTAL_BORDER};
-        cout << TOP_LEFT_CORNER_BORDER << repeat(b , getDisplayWidth()-2) << TOP_RIGHT_CORNER_BORDER;
-    }
-    void drawFooter() {
-        string b = {HORIZONTAL_BORDER};
-        cout << BOTTOM_LEFT_CORNER_BORDER << repeat(b , getDisplayWidth()-2) << BOTTOM_RIGHT_CORNER_BORDER;
-    }
+    void drawHeader();
 
-    void draw(){
-        consoleSelect(&this->printConsole);
-        cout << position(0,0) << BG_DEFAULT;
-        drawHeader();
-        // number of lines we need to skip from the top of console ( top border in this case)
-        u32 offset = 1;
-        for (u32 i = 0; i < this->getDisplayHeight() ; ++i) {
-            cout << position(i + offset,0);
-            u32 drawingItem = i + this->ctx.startingIndex;
-            cout << BG_DEFAULT << VERTICAL_BORDER;
-            bool is_selected = (drawingItem == this->ctx.selectedItem && this->active);
-            if(is_selected) {
-                cout << BG_HIGHLIGHT;
-                consoleSelect(&bottom);
-                printf("\nStat for file %s\n", this->getItem(drawingItem).name.c_str());
-                printf("Path: %s\n", this->getItem(drawingItem).path.c_str());
-                printf("Mode: %d\n", this->getItem(drawingItem).stats.st_mode);
-                consoleSelect(&this->printConsole);
-            }
-            string filename = "";
-            string type = " ";
-            if(drawingItem <= this->getMaxIndex()){
-                filename = this->getItem(drawingItem).name;
-                type = getTypeIcon(this->getItem(drawingItem));
-            }
+    void drawFooter();
 
-            cout << type << this->prepareFilename(filename) << VERTICAL_BORDER << "     ";
-            if(is_selected) {
-                cout << BG_DEFAULT;
-            }
-            cout  << VERTICAL_BORDER;
-        }
-        cout << position(getDisplayHeight() + offset,0) << BG_DEFAULT;
-        drawFooter();
-    }
+    void draw();
 
-    string prepareFilename(string s){
-        string s1 = s.substr(0, FILENAME_WIDTH);
-        while (s1.length() < FILENAME_WIDTH){
-            s1+=" ";
-        }
-        return s1;
-    }
+    u32 getDisplayHeight();
 
-    u32 getDisplayHeight(){
-        int ht = this->printConsole.windowHeight - OCCUPIED;
-        if (ht < OCCUPIED){
-            return 0;
-        }
-        return (u32)ht;
-    }
-    u32 getDisplayWidth(){
-        int wt = this->printConsole.windowWidth;
-        if (wt < 0){
-            return 0;
-        }
-        return (u32)wt;
-    }
+    u32 getDisplayWidth();
 
-    u32 getBottomIndex(){
-        return this->ctx.startingIndex + this->getDisplayHeight() - 1;
-    }
+    u32 getBottomIndex();
 
-    u32 getMaxIndex(){
-        return getNumberOfItems()-1;
-    }
-    u32 getNumberOfItems(){
-        return items.size();
-    }
+    u32 getMaxIndex();
+
+    u32 getNumberOfItems();
 
     PrintConsole printConsole;
     vector<FileInfo> items;
     vector<DisplayContext> history;
     DisplayContext ctx;
+    FileManager* fm;
     bool active;
     // # of lines that occupied by things that are not list of files
     const int OCCUPIED = 2;
