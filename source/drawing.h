@@ -39,6 +39,6 @@ const std::string BG_PROMPT = setColor(COLOR_WHITE, COLOR_RED);
 const std::string UPWARDS_ARROW = {(char)0x18};
 void drawFooter(BorderSet borderSet, u32 width);
 void drawHeader(BorderSet borderSet, u32 width);
-
+void drawBorder(BorderSet borderSet, u32 width, u32 height);
 
 #endif //MAIN_EXEC_DRAWING_H

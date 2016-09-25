@@ -83,11 +83,12 @@ void FileManager::setmode(DisplayMode_t mode){
             consoleSelect(&prompt);
             cout << BG_PROMPT;
             consoleClear();
+            drawBorder(border_double, (u32)prompt.windowWidth, (u32)prompt.windowHeight);
             consoleSelect(&prompt_body);
             cout << BG_PROMPT;
             consoleClear();
             string name = active->getSelectedItem().name;
-            printf("Delete file?\n\t%s\n\n\t [A] OK\t[B] CANCEL ", name.c_str());
+            printf("Delete file?\n\n\t%s\n\n\t[A] OK\t[B] CANCEL ", name.c_str());
             break;
         }
         case MODE_NORMAL: {
