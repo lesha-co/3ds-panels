@@ -188,7 +188,7 @@ string FilePane::getBottomInfo(){
     string s_all = to_string(all);
     u32 len = s_all.length();
     string s_current = to_string(ctx.selectedItem+1);
-    s_current = leftpad(s_current, len);
+    s_current = rightpad(s_current, len);
     return "[" + s_current + "/" + s_all + "]";
 }
 
