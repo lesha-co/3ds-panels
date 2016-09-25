@@ -5,7 +5,9 @@
 #ifndef MAIN_EXEC_DRAWING_H
 #define MAIN_EXEC_DRAWING_H
 
-#include "includes.h"
+#include "types.h"
+#include "../3ds_string_utils/source/string_utils.h"
+#include <iostream>
 struct BorderSet{
     std::string VERTICAL;
     std::string HORIZONTAL;
@@ -35,6 +37,8 @@ const std::string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
 const std::string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
 const std::string BG_PROMPT = setColor(COLOR_WHITE, COLOR_RED);
 const std::string UPWARDS_ARROW = {(char)0x18};
+void drawFooter(BorderSet borderSet, u32 width);
+void drawHeader(BorderSet borderSet, u32 width);
 
 
 #endif //MAIN_EXEC_DRAWING_H

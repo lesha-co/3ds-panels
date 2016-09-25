@@ -6,7 +6,11 @@
 #define MAIN_EXEC_FILEMANAGER_H
 class FilePane;
 
-#include "includes.h"
+#include "3ds.h"
+#include "FilePane.h"
+#include "types.h"
+#include <vector>
+#include <string>
 
 class FileManager {
 public:

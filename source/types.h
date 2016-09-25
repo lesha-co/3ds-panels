@@ -4,7 +4,9 @@
 
 #ifndef MAIN_EXEC_TYPES_H
 #define MAIN_EXEC_TYPES_H
-#include "includes.h"
+#include "3ds.h"
+#include <string>
+#include <dirent.h>
 typedef struct dirent dirent;
 typedef struct stat s_stat;
 

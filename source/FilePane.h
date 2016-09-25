@@ -6,8 +6,15 @@
 #define MAIN_EXEC_FILEPANE_H
 class FileManager;
 
-#include "includes.h"
-
+#include "3ds.h"
+#include "types.h"
+#include "FileManager.h"
+#include "drawing.h"
+#include <string>
+#include <vector>
+#include <sstream>
+#include <iostream>
+#include <cstdio>
 #define  UPDIR ".."
 
 const u8 FILENAME_WIDTH = 16;

@@ -37,14 +37,6 @@ string rightpad(string s, u32 width){
     return s1;
 }
 
-string repeat(string in, u32 times){
-    string s = "";
-    for (u32 i = 0; i < times; ++i) {
-        s += in;
-    }
-    return s;
-}
-
 FilePane::FilePane(PrintConsole printConsole, FileManager* fm) {
     this->printConsole = printConsole;
     this->active = false;

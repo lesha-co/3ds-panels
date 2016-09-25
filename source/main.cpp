@@ -1,5 +1,7 @@
-#include "includes.h"
-
+#include "3ds.h"
+#include <cstdio>
+#include <unistd.h>
+#include "FileManager.h"
 using namespace std;
 void drawASCII(){
     for (int i = 0; i < 256; ++i) {
