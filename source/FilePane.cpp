@@ -303,6 +303,17 @@ void FilePane::redraw() {
     this->ctx.selectedItem = selected;
     draw();
 }
+
+vector<FileInfo*> FilePane::getMarkedItems(){
+    vector<FileInfo*> vec;
+    for(FileInfo item : items){
+        if(item.marked){
+            vec.push_back(&item);
+        }
+    }
+    return vec;
+}
+
 void FilePane::clock(u32 kDown, u32 kHeld) {
     if ((kHeld | kDown) & KEY_DOWN){
         this->moveDown();

@@ -30,6 +30,8 @@ public:
 
     FileInfo* getSelectedItem();
 
+    std::vector<FileInfo*> getMarkedItems();
+
     std::string getCWD();
 
     void moveUp();
