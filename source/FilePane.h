@@ -72,6 +72,11 @@ private:
     u32 getMaxIndex();
 
     u32 getNumberOfItems();
+    /**
+     * Build a string that has total # of items in current directory and current selected item
+     * @return said string
+     */
+    std::string getBottomInfo();
 
     PrintConsole printConsole;
     std::vector<FileInfo> items;

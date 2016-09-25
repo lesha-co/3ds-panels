@@ -182,7 +182,16 @@ void FilePane::drawFooter(BorderSet borderSet, u32 width) {
     std::string b = {borderSet.HORIZONTAL};
     cout << borderSet.BOTTOM_LEFT_CORNER << repeat(b , width-2) << borderSet.BOTTOM_RIGHT_CORNER;
 }
-//
+
+string FilePane::getBottomInfo(){
+    u32 all = getNumberOfItems();
+    string s_all = to_string(all);
+    u32 len = s_all.length();
+    string s_current = to_string(ctx.selectedItem+1);
+    s_current = leftpad(s_current, len);
+    return "[" + s_current + "/" + s_all + "]";
+}
+
 void FilePane::draw(){
 
     consoleSelect(&this->printConsole);
@@ -224,6 +233,9 @@ void FilePane::draw(){
     }
     cout << position(getDisplayHeight() + offset,0) << BG_DEFAULT;
     drawFooter(borderSet, width );
+    // drawing current selected item an total # of items
+    string bottomInfo = getBottomInfo();
+    cout << position(getDisplayHeight() + offset, width - bottomInfo.length() - 3) << bottomInfo;
 }
 
 u32 FilePane::getDisplayHeight(){
