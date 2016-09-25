@@ -36,6 +36,7 @@ const BorderSet border_double = {
 const std::string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
 const std::string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
 const std::string BG_PROMPT = setColor(COLOR_WHITE, COLOR_RED);
+const std::string BG_PROMPT_HIGHLIGHT = setColor(COLOR_RED, COLOR_WHITE);
 const std::string UPWARDS_ARROW = {(char)0x18};
 void drawFooter(BorderSet borderSet, u32 width);
 void drawHeader(BorderSet borderSet, u32 width);

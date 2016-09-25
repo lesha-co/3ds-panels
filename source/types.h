@@ -23,7 +23,9 @@ struct DisplayContext{
 };
 
 enum DisplayMode_t{
-    MODE_NORMAL = 0,
-    MODE_PROMPT_DELETE = 1
+    MODE_NORMAL,
+    MODE_PROMPT_DELETE,
+    MODE_PROMPT_COPY,
+    MODE_MENU,
 };
 #endif //MAIN_EXEC_TYPES_H

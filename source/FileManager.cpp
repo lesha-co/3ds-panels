@@ -15,6 +15,8 @@ FileManager::FileManager(string cwd_left, string cwd_right){
     this->mode = MODE_NORMAL;
     l->setActive(true);
     this->onCWDUpdate(active);
+    menuConfig = {MENU_COPY, MENU_DELETE};
+    selectedMenuItem = 0;
 }
 
 FileManager::~FileManager(){
@@ -72,23 +74,91 @@ void FileManager::setupConsoles(){
 PrintConsole* FileManager::getBottomConsole(){
     return &bottom;
 }
+
 void FileManager::DeleteFile(string path){
     remove(path.c_str());
-    active->redraw();
+    //active->redraw();
+}
+void FileManager::CopyFile(string from, string to){
+    const char* from_path = from.c_str();
+    const char* to_path = to.c_str();
+    printf("\n\n\t%s", from_path);
+    printf("\n\n\t%s", to_path);
+
+    char buf[BUFSIZ];
+    size_t size;
+
+    FILE* source = fopen(from_path, "rb");
+    FILE* dest = fopen(to_path, "wb");
+
+
+    printf("\n\n\tstarting...");
+    while (true) {
+        size = fread(buf, 1, BUFSIZ, source);
+        if (size <= 0)
+            break;
+        fwrite(buf, 1, size, dest);
+    }
+    fclose(source);
+    fclose(dest);
+
+    printf("\n\n\tOK");
+
+}
+
+void FileManager::preparePrompt(bool selectBody){
+    consoleSelect(&prompt);
+    cout << BG_PROMPT;
+    consoleClear();
+    drawBorder(border_double, &prompt);
+    if(selectBody){
+        consoleSelect(&prompt_body);
+        cout << BG_PROMPT;
+        consoleClear();
+    }
+}
+void FileManager::drawMenu(){
+    preparePrompt(true);
+    for (u32 i = 0; i < menuConfig.size(); ++i) {
+        if(i == selectedMenuItem){
+            cout << BG_PROMPT_HIGHLIGHT;
+        }
+        cout << position(i,0);
+        switch(menuConfig[i]){
+            case MENU_COPY:
+                cout << "Copy...";
+                break;
+            case MENU_DELETE:
+                cout << "Delete...";
+                break;
+        }
+        if(i == selectedMenuItem){
+            cout << BG_PROMPT;
+        }
+    }
 }
 void FileManager::setmode(DisplayMode_t mode){
     this->mode = mode;
     switch(this->mode){
+        case MODE_MENU:{
+            drawMenu();
+            break;
+        }
         case MODE_PROMPT_DELETE: {
-            consoleSelect(&prompt);
-            cout << BG_PROMPT;
-            consoleClear();
-            drawBorder(border_double, &prompt);
-            consoleSelect(&prompt_body);
-            cout << BG_PROMPT;
-            consoleClear();
+            preparePrompt(true);
             string name = active->getSelectedItem().name;
             printf("Delete file?\n\n\t%s\n\n\t[A] OK\t[B] CANCEL ", name.c_str());
+            break;
+        }
+        case MODE_PROMPT_COPY: {
+            preparePrompt(true);
+            string name = active->getSelectedItem().name;
+            string to_path = getInactivePane()->getCWD()+"/"+name;
+            printf("Copy file\n\n\t%s\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL ",
+                   name.c_str(),
+                   active->getCWD().c_str(),
+                   to_path.c_str()
+            );
             break;
         }
         case MODE_NORMAL: {
@@ -103,10 +173,63 @@ void FileManager::setmode(DisplayMode_t mode){
 }
 void FileManager::clock(u32 kDown, u32 kHeld){
     switch(this->mode){
+        case MODE_MENU:{
+            if ((kHeld | kDown) & KEY_A){
+                switch(menuConfig[selectedMenuItem]){
+                    case MENU_COPY:
+                        setmode(MODE_PROMPT_COPY);
+                        break;
+                    case MENU_DELETE:
+                        setmode(MODE_PROMPT_DELETE);
+                        break;
+                }
+            }
+            if ((kHeld | kDown) & KEY_DOWN){
+                if (selectedMenuItem >= menuConfig.size() -1){
+                    selectedMenuItem = 0;
+                } else {
+                    selectedMenuItem ++;
+                }
+                drawMenu();
+            }
+            if ((kHeld | kDown) & KEY_LEFT){
+                selectedMenuItem = 0;
+                drawMenu();
+            }
+            if ((kHeld | kDown) & KEY_RIGHT){
+                selectedMenuItem = menuConfig.size() -1;
+                drawMenu();
+            }
+            if ((kHeld | kDown) & KEY_UP){
+                if (selectedMenuItem == 0){
+                    selectedMenuItem = menuConfig.size() -1;
+                } else {
+                    selectedMenuItem --;
+                }
+                drawMenu();
+            }
+            if ((kHeld | kDown) & KEY_B){
+                this->setmode(MODE_NORMAL);
+            }
+            break;
+        }
+
         case MODE_PROMPT_DELETE:{
             if (kDown & KEY_A){
                 FileInfo f = active->getSelectedItem();
                 DeleteFile(f.path);
+                this->setmode(MODE_NORMAL);
+            }
+            if (kDown & KEY_B){
+                this->setmode(MODE_NORMAL);
+            }
+            break;
+        }
+        case MODE_PROMPT_COPY:{
+            if (kDown & KEY_A){
+                FileInfo f = active->getSelectedItem();
+                string to_path = getInactivePane()->getCWD()+"/"+f.name;
+                CopyFile(f.path, to_path);
                 this->setmode(MODE_NORMAL);
             }
             if (kDown & KEY_B){
@@ -135,8 +258,8 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             if (kDown & KEY_B){
                 active->updir();
             }
-            if (kDown & KEY_X){
-                this->setmode(MODE_PROMPT_DELETE);
+            if (kDown & KEY_Y){
+                this->setmode(MODE_MENU);
             }
             if (kDown & KEY_L){
                 active = l;
@@ -150,12 +273,9 @@ void FileManager::clock(u32 kDown, u32 kHeld){
                 l->setActive(false);
                 this->onCWDUpdate(active);
             }
-
             break;
     }
-
 }
-
 
 vector<FileInfo> FileManager::list_files(string dir){
     list_called++;
@@ -191,6 +311,7 @@ vector<FileInfo> FileManager::list_files(string dir){
     }
     return v;
 }
+
 void FileManager::onCWDUpdate(FilePane* pane){
     if (pane == this->active){
         consoleSelect(&this->under_panels);
@@ -201,4 +322,8 @@ void FileManager::onCWDUpdate(FilePane* pane){
             cwd = "/";
         cout << cwd;
     }
+}
+
+FilePane* FileManager::getInactivePane(){
+    return (active == l)? r : l;
 }

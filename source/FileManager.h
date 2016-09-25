@@ -12,6 +12,10 @@ class FilePane;
 #include <vector>
 #include <string>
 
+enum Menu_t {
+    MENU_COPY,
+    MENU_DELETE
+};
 class FileManager {
 public:
     FileManager(std::string cwd_left, std::string cwd_right);
@@ -27,6 +31,8 @@ public:
     void onCWDUpdate(FilePane* pane);
 
     void DeleteFile(std::string path);
+
+    void CopyFile(std::string from, std::string to);
 private:
     void setupConsoles();
 
@@ -36,7 +42,11 @@ private:
     PrintConsole menu, leftpan, rightpan, under_panels, actions, bottom,
         prompt, prompt_body;
     DisplayMode_t mode;
-
+    std::vector<Menu_t> menuConfig;
+    u32 selectedMenuItem;
+    void preparePrompt(bool selectBody);
+    void drawMenu();
+    FilePane* getInactivePane();
     void setmode(DisplayMode_t mode);
 };
 
