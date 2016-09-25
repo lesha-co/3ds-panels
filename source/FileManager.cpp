@@ -83,7 +83,7 @@ void FileManager::setmode(DisplayMode_t mode){
             consoleSelect(&prompt);
             cout << BG_PROMPT;
             consoleClear();
-            drawBorder(border_double, (u32)prompt.windowWidth, (u32)prompt.windowHeight);
+            drawBorder(border_double, &prompt);
             consoleSelect(&prompt_body);
             cout << BG_PROMPT;
             consoleClear();

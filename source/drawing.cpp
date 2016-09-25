@@ -23,3 +23,9 @@ void drawBorder(BorderSet borderSet, u32 width, u32 height){
     cout << position(height - 1,0);
     drawFooter(borderSet, width);
 }
+
+void drawBorder(BorderSet borderSet, PrintConsole* printConsole){
+    u32 width = (u32)printConsole->windowWidth;
+    u32 height = (u32)printConsole->windowHeight;
+    drawBorder(borderSet, width, height);
+}

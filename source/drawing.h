@@ -40,5 +40,6 @@ const std::string UPWARDS_ARROW = {(char)0x18};
 void drawFooter(BorderSet borderSet, u32 width);
 void drawHeader(BorderSet borderSet, u32 width);
 void drawBorder(BorderSet borderSet, u32 width, u32 height);
+void drawBorder(BorderSet borderSet, PrintConsole* printConsole);
 
 #endif //MAIN_EXEC_DRAWING_H
