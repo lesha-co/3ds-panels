@@ -17,7 +17,7 @@ void drawFooter(BorderSet borderSet, u32 width) {
 void drawBorder(BorderSet borderSet, u32 width, u32 height){
     cout << position(0,0);
     drawHeader(borderSet, width);
-    for (int i = 0; i < height - 2; ++i) {
+    for (u32 i = 0; i < height - 2; ++i) {
         cout << position(1 + i, 0) << borderSet.VERTICAL << repeat(" ", width-2) << borderSet.VERTICAL ;
     }
     cout << position(height - 1,0);
