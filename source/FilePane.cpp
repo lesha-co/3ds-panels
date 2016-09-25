@@ -48,12 +48,12 @@ void FilePane::setActive(bool active){
     draw();
 }
 
-FileInfo FilePane::getItem(u32 index) {
-    return this->items[index];
+FileInfo* FilePane::getItem(u32 index) {
+    return &this->items[index];
 
 }
 
-FileInfo FilePane::getSelectedItem() {
+FileInfo* FilePane::getSelectedItem() {
     return getItem(this->ctx.selectedItem);
 }
 
@@ -115,13 +115,13 @@ void FilePane::updir(){
     }
 }
 void FilePane::enter(){
-    FileInfo f = getSelectedItem();
-    if(f.special && f.name==UPDIR){
+    FileInfo* f = getSelectedItem();
+    if(f->special && f->name==UPDIR){
         updir();
     } else {
-        if(S_ISDIR(f.stats.st_mode)){
+        if(S_ISDIR(f->stats.st_mode)){
             history.push_back(this->ctx);
-            setContext(f.path, 0, 0);
+            setContext(f->path, 0, 0);
 
         }
 
@@ -211,8 +211,8 @@ void FilePane::draw(){
         // checking if there is a file at all
         cout << position(i + offset,0) << BG_DEFAULT << borderSet.VERTICAL;
         if(drawingItemIndex <= this->getMaxIndex()){
-            FileInfo f = this->getItem(drawingItemIndex);
-            bool is_marked = f.marked;
+            FileInfo* f = this->getItem(drawingItemIndex);
+            bool is_marked = f->marked;
             // determining text color
             if(is_marked){
                 text_color = COLOR_YELLOW;
@@ -233,12 +233,12 @@ void FilePane::draw(){
             }
             string text_style = setColor(text_color, background_color);
             string delim_style = setColor(delimiter_color, background_color);
-            string type = getTypeIcon(f);
-            string supplementary = getSupplementaryInfo(f).substr(0,5);
+            string type = getTypeIcon(*f);
+            string supplementary = getSupplementaryInfo(*f).substr(0,5);
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // actual writing
             // filename
-            cout << text_style << type << leftpad(f.name, FILENAME_WIDTH);
+            cout << text_style << type << leftpad(f->name, FILENAME_WIDTH);
             // delimiter
             cout << delim_style << borderSet.VERTICAL << text_style;
             // additional info
@@ -323,7 +323,7 @@ void FilePane::clock(u32 kDown, u32 kHeld) {
         this->updir();
     }
     if (kDown & KEY_X){
-        this->items[this->ctx.selectedItem].marked = !this->items[this->ctx.selectedItem].marked;
+        this->getSelectedItem()->marked = !this->getSelectedItem()->marked;
         draw();
     }
 

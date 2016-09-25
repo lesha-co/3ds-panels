@@ -26,9 +26,9 @@ public:
 
     void setActive(bool active);
 
-    FileInfo getItem(u32 index);
+    FileInfo* getItem(u32 index);
 
-    FileInfo getSelectedItem();
+    FileInfo* getSelectedItem();
 
     std::string getCWD();
 

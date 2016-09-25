@@ -118,13 +118,13 @@ void FileManager::setmode(DisplayMode_t mode){
         }
         case MODE_PROMPT_DELETE: {
             preparePrompt(true);
-            string name = active->getSelectedItem().name;
+            string name = active->getSelectedItem()->name;
             printf("Delete file?\n\n\t%s\n\n\t[A] OK\t[B] CANCEL ", name.c_str());
             break;
         }
         case MODE_PROMPT_COPY: {
             preparePrompt(true);
-            string name = active->getSelectedItem().name;
+            string name = active->getSelectedItem()->name;
             string to_path = getInactivePane()->getCWD()+"/"+name;
             printf("Copy file\n\n\t%s\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL ",
                    name.c_str(),
@@ -142,7 +142,7 @@ void FileManager::setmode(DisplayMode_t mode){
 
         case MODE_PROMPT_MOVE:{
             preparePrompt(true);
-            string name = active->getSelectedItem().name;
+            string name = active->getSelectedItem()->name;
             string to_path = getInactivePane()->getCWD()+"/"+name;
             printf("Move file\n\n\t%s\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL ",
                    name.c_str(),
@@ -201,8 +201,8 @@ void FileManager::clock(u32 kDown, u32 kHeld){
 
         case MODE_PROMPT_DELETE:{
             if (kDown & KEY_A){
-                FileInfo f = active->getSelectedItem();
-                DiskOperation del(DELETE, f.path, "");
+                FileInfo* f = active->getSelectedItem();
+                DiskOperation del(DELETE, f->path, "");
                 del.commence();
                 this->setmode(MODE_NORMAL);
             }
@@ -213,9 +213,9 @@ void FileManager::clock(u32 kDown, u32 kHeld){
         }
         case MODE_PROMPT_COPY:{
             if (kDown & KEY_A){
-                FileInfo f = active->getSelectedItem();
-                string to_path = getInactivePane()->getCWD()+"/"+f.name;
-                DiskOperation cp(COPY, f.path, to_path);
+                FileInfo* f = active->getSelectedItem();
+                string to_path = getInactivePane()->getCWD()+"/"+f->name;
+                DiskOperation cp(COPY, f->path, to_path);
                 cp.commence();
                 this->setmode(MODE_NORMAL);
             }
@@ -226,10 +226,10 @@ void FileManager::clock(u32 kDown, u32 kHeld){
         }
         case MODE_PROMPT_MOVE:{
             if (kDown & KEY_A){
-                FileInfo f = active->getSelectedItem();
-                string to_path = getInactivePane()->getCWD()+"/"+f.name;
-                DiskOperation cp(COPY, f.path, to_path);
-                DiskOperation del(DELETE, f.path, "");
+                FileInfo* f = active->getSelectedItem();
+                string to_path = getInactivePane()->getCWD()+"/"+f->name;
+                DiskOperation cp(COPY, f->path, to_path);
+                DiskOperation del(DELETE, f->path, "");
                 cp.commence();
                 del.commence();
                 this->setmode(MODE_NORMAL);
