@@ -34,6 +34,7 @@ const BorderSet border_double = {
 };
 
 const std::string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
+const std::string BG_DEFAULT_INVERTED = setColor(COLOR_BLUE, COLOR_WHITE);
 const std::string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
 const std::string BG_PROMPT = setColor(COLOR_WHITE, COLOR_RED);
 const std::string BG_PROMPT_HIGHLIGHT = setColor(COLOR_RED, COLOR_WHITE);

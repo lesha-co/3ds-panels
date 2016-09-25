@@ -199,6 +199,8 @@ void FilePane::draw(){
     BorderSet borderSet = border_single;
     u32 width = getDisplayWidth();
     drawHeader(borderSet, width);
+    cout << position(0,1) << BG_DEFAULT_INVERTED << "Name";
+    cout << position(0,FILENAME_WIDTH+3) << "Size";
     // number of lines we need to skip from the top of under_panels ( top border in this case)
     u32 offset = 1;
     for (u32 i = 0; i < this->getDisplayHeight() ; ++i) {
@@ -235,7 +237,7 @@ void FilePane::draw(){
     drawFooter(borderSet, width );
     // drawing current selected item an total # of items
     string bottomInfo = getBottomInfo();
-    cout << position(getDisplayHeight() + offset, width - bottomInfo.length() - 3) << bottomInfo;
+    cout << position(getDisplayHeight() + offset, width - bottomInfo.length() - 3) << BG_DEFAULT_INVERTED << bottomInfo;
 }
 
 u32 FilePane::getDisplayHeight(){
