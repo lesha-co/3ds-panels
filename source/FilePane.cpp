@@ -285,3 +285,23 @@ void FilePane::redraw() {
     this->ctx.selectedItem = selected;
     draw();
 }
+void FilePane::clock(u32 kDown, u32 kHeld) {
+    if ((kHeld | kDown) & KEY_DOWN){
+        this->moveDown();
+    }
+    if ((kHeld | kDown) & KEY_UP){
+        this->moveUp();
+    }
+    if ((kHeld | kDown) & KEY_DLEFT){
+        this->moveTop();
+    }
+    if ((kHeld | kDown) & KEY_DRIGHT){
+        this->moveEnd();
+    }
+    if (kDown & KEY_A){
+        this->enter();
+    }
+    if (kDown & KEY_B){
+        this->updir();
+    }
+}

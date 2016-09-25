@@ -240,24 +240,10 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             break;
         }
         case MODE_NORMAL:
-
-            if ((kHeld | kDown) & KEY_DOWN){
-                active->moveDown();
-            }
-            if ((kHeld | kDown) & KEY_UP){
-                active->moveUp();
-            }
-            if ((kHeld | kDown) & KEY_DLEFT){
-                active->moveTop();
-            }
-            if ((kHeld | kDown) & KEY_DRIGHT){
-                active->moveEnd();
-            }
-            if (kDown & KEY_A){
-                active->enter();
-            }
-            if (kDown & KEY_B){
-                active->updir();
+            u32 pane_controls_mask = (KEY_DOWN | KEY_UP | KEY_DLEFT | KEY_DRIGHT | KEY_A | KEY_B);
+            if ((kHeld | kDown) & pane_controls_mask){
+                active->clock(kDown & pane_controls_mask,
+                              kHeld & pane_controls_mask);
             }
             if (kDown & KEY_Y){
                 this->setmode(MODE_MENU);

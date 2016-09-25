@@ -48,6 +48,8 @@ public:
 
     void redraw();
 
+    void clock(u32 kDown, u32 kHeld);
+
 private:
     void setContext(DisplayContext newContext);
 
