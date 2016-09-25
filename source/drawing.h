@@ -8,12 +8,12 @@
 #include <string>
 #include "3ds.h"
 struct BorderSet{
-    string VERTICAL;
-    string HORIZONTAL;
-    string TOP_LEFT_CORNER;
-    string TOP_RIGHT_CORNER;
-    string BOTTOM_LEFT_CORNER;
-    string BOTTOM_RIGHT_CORNER;
+    std::string VERTICAL;
+    std::string HORIZONTAL;
+    std::string TOP_LEFT_CORNER;
+    std::string TOP_RIGHT_CORNER;
+    std::string BOTTOM_LEFT_CORNER;
+    std::string BOTTOM_RIGHT_CORNER;
 };
 const BorderSet border_single = {
     {(char)0xB3},
@@ -32,6 +32,10 @@ const BorderSet border_double = {
     {(char)0xBC},
 };
 
+const std::string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
+const std::string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
+const std::string BG_PROMPT = setColor(COLOR_WHITE, COLOR_RED);
+const std::string UPWARDS_ARROW = {(char)0x18};
 
 
 #endif //MAIN_EXEC_DRAWING_H

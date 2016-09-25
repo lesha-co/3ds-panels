@@ -3,6 +3,7 @@
 //
 #include <unistd.h>
 #include "FilePane.h"
+using namespace std;
 template <class T>
 string to_string (const T& t) {
     std::stringstream ss;

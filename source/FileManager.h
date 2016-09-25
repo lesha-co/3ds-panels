@@ -5,14 +5,14 @@
 #ifndef MAIN_EXEC_FILEMANAGER_H
 #define MAIN_EXEC_FILEMANAGER_H
 #include <string>
+#include <vector>
 #include "types.h"
 class FilePane;
 #include "FilePane.h"
-using namespace std;
 
 class FileManager {
 public:
-    FileManager(string cwd_left, string cwd_right);
+    FileManager(std::string cwd_left, std::string cwd_right);
 
     ~FileManager();
 
@@ -20,11 +20,11 @@ public:
 
     PrintConsole* getBottomConsole();
 
-    vector<FileInfo> list_files(string dir);
+    std::vector<FileInfo> list_files(std::string dir);
 
     void onCWDUpdate(FilePane* pane);
 
-    void DeleteFile(string path);
+    void DeleteFile(std::string path);
 private:
     void setupConsoles();
 

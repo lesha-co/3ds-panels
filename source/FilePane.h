@@ -17,22 +17,9 @@ class FileManager;
 #include "types.h"
 #include "drawing.h"
 
-using namespace std;
-
 #define  UPDIR ".."
-//const string VERTICAL_BORDER = {(char)0xB3};
-//const string HORIZONTAL_BORDER = {(char)0xC4};
-//const string TOP_LEFT_CORNER_BORDER = {(char)0xDA};
-//const string TOP_RIGHT_CORNER_BORDER = {(char)0xBF};
-//const string BOTTOM_LEFT_CORNER_BORDER = {(char)0xC0};
-//const string BOTTOM_RIGHT_CORNER_BORDER = {(char)0xD9};
 
-
-const string UPWARDS_ARROW = {(char)0x18};
 const u8 FILENAME_WIDTH = 16;
-const string BG_DEFAULT = setColor(COLOR_WHITE, COLOR_BLUE);
-const string BG_HIGHLIGHT = setColor(COLOR_BLACK, COLOR_CYAN);
-const string BG_PROMPT = setColor(COLOR_WHITE, COLOR_RED);
 
 
 class FilePane {
@@ -45,7 +32,7 @@ public:
 
     FileInfo getSelectedItem();
 
-    string getCWD();
+    std::string getCWD();
 
     void moveUp();
 
@@ -59,18 +46,18 @@ public:
 
     void enter();
 
-    void setContext(string cwd);
+    void setContext(std::string cwd);
 
     void redraw();
 
 private:
     void setContext(DisplayContext newContext);
 
-    void setContext(string cwd, u32 selectedItem, u32 startingIndex);
+    void setContext(std::string cwd, u32 selectedItem, u32 startingIndex);
 
-    string getSupplementaryInfo(FileInfo info);
+    std::string getSupplementaryInfo(FileInfo info);
     
-    string getTypeIcon(FileInfo info);
+    std::string getTypeIcon(FileInfo info);
 
     void drawHeader(BorderSet borderSet, u32 width);
 
@@ -89,8 +76,8 @@ private:
     u32 getNumberOfItems();
 
     PrintConsole printConsole;
-    vector<FileInfo> items;
-    vector<DisplayContext> history;
+    std::vector<FileInfo> items;
+    std::vector<DisplayContext> history;
     DisplayContext ctx;
     FileManager* fm;
     bool active;
