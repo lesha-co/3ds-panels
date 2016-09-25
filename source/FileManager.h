@@ -4,11 +4,9 @@
 
 #ifndef MAIN_EXEC_FILEMANAGER_H
 #define MAIN_EXEC_FILEMANAGER_H
-#include <string>
-#include <vector>
-#include "types.h"
 class FilePane;
-#include "FilePane.h"
+
+#include "includes.h"
 
 class FileManager {
 public:

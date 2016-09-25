@@ -5,17 +5,8 @@
 #ifndef MAIN_EXEC_FILEPANE_H
 #define MAIN_EXEC_FILEPANE_H
 class FileManager;
-#include <3ds.h>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <cstdio>
-#include <dirent.h>
-#include <iostream>
-#include "../3ds_string_utils/source/string_utils.h"
-#include "FileManager.h"
-#include "types.h"
-#include "drawing.h"
+
+#include "includes.h"
 
 #define  UPDIR ".."
 

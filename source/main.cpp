@@ -1,7 +1,4 @@
-#include <unistd.h>
-#include <cstdio>
-#include "3ds.h"
-#include "FileManager.h"
+#include "includes.h"
 
 using namespace std;
 void drawASCII(){

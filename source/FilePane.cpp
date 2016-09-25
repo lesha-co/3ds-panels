@@ -1,7 +1,6 @@
 //
 // Created by lichevsky on 24.09.16.
 //
-#include <unistd.h>
 #include "FilePane.h"
 using namespace std;
 template <class T>

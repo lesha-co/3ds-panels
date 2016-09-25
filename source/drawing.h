@@ -5,8 +5,7 @@
 #ifndef MAIN_EXEC_DRAWING_H
 #define MAIN_EXEC_DRAWING_H
 
-#include <string>
-#include "3ds.h"
+#include "includes.h"
 struct BorderSet{
     std::string VERTICAL;
     std::string HORIZONTAL;
