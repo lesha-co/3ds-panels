@@ -65,6 +65,8 @@ private:
 
     void drawFooter(BorderSet borderSet, u32 width);
 
+    void drawStat(FileInfo* fileInfo);
+
     void draw();
 
     u32 getDisplayHeight();

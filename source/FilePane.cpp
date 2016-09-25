@@ -192,6 +192,16 @@ string FilePane::getBottomInfo(){
     return "[" + s_current + "/" + s_all + "]";
 }
 
+void FilePane::drawStat(FileInfo* fileInfo){
+    consoleSelect(fm->getBottomConsole());
+    consoleClear();
+    printf("\nStat for file %s\n", fileInfo->name.c_str());
+    printf("Path: %s\n", fileInfo->path.c_str());
+    printf("Mode: %d\n", fileInfo->stats.st_mode);
+    printf("Size: %lu\n", (u32)fileInfo->stats.st_size);
+    consoleSelect(&this->printConsole);
+}
+
 void FilePane::draw(){
     consoleSelect(&this->printConsole);
     cout << position(0,0) << BG_DEFAULT;
@@ -212,6 +222,9 @@ void FilePane::draw(){
         cout << position(i + offset,0) << BG_DEFAULT << borderSet.VERTICAL;
         if(drawingItemIndex <= this->getMaxIndex()){
             FileInfo* f = this->getItem(drawingItemIndex);
+            if(is_selected){
+                drawStat(f);
+            }
             bool is_marked = f->marked;
             // determining text color
             if(is_marked){
