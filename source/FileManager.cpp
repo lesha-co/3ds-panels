@@ -3,7 +3,7 @@
 //
 #include <unistd.h>
 #include "FileManager.h"
-#include "types.h"
+
 using namespace std;
 int list_called = 0;
 FileManager::FileManager(string cwd_left, string cwd_right){
