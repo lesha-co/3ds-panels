@@ -8,6 +8,7 @@ class FilePane;
 
 #include "3ds.h"
 #include "FilePane.h"
+#include "DiskOperation.h"
 #include "types.h"
 #include <vector>
 #include <string>
@@ -31,9 +32,6 @@ public:
 
     void onCWDUpdate(FilePane* pane);
 
-    void DeleteFile(std::string path);
-
-    void CopyFile(std::string from, std::string to);
 private:
     void setupConsoles();
 
