@@ -14,6 +14,7 @@ struct FileInfo{
     std::string name;
     std::string path;
     bool special;
+    bool marked;
     s_stat stats;
 };
 struct DisplayContext{

@@ -240,7 +240,7 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             break;
         }
         case MODE_NORMAL:
-            u32 pane_controls_mask = (KEY_DOWN | KEY_UP | KEY_DLEFT | KEY_DRIGHT | KEY_A | KEY_B);
+            u32 pane_controls_mask = (KEY_DOWN | KEY_UP | KEY_DLEFT | KEY_DRIGHT | KEY_A | KEY_B | KEY_X);
             if ((kHeld | kDown) & pane_controls_mask){
                 active->clock(kDown & pane_controls_mask,
                               kHeld & pane_controls_mask);
@@ -273,6 +273,7 @@ vector<FileInfo> FileManager::list_files(string dir){
     vector<FileInfo> v;
     if (dir != ""){
         FileInfo up;
+        up.marked = false;
         up.name = UPDIR;
         up.special = true;
         v.push_back(up);
@@ -289,6 +290,7 @@ vector<FileInfo> FileManager::list_files(string dir){
         {
             FileInfo fi;
             fi.name = dirp->d_name;
+            fi.marked = false;
             fi.path = dir + "/" + dirp->d_name;
             stat( fi.path.c_str(), &fi.stats );
 

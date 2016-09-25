@@ -193,7 +193,6 @@ string FilePane::getBottomInfo(){
 }
 
 void FilePane::draw(){
-
     consoleSelect(&this->printConsole);
     cout << position(0,0) << BG_DEFAULT;
     BorderSet borderSet = border_single;
@@ -204,40 +203,59 @@ void FilePane::draw(){
     // number of lines we need to skip from the top of under_panels ( top border in this case)
     u32 offset = 1;
     for (u32 i = 0; i < this->getDisplayHeight() ; ++i) {
-        cout << position(i + offset,0);
-        u32 drawingItem = i + this->ctx.startingIndex;
-        cout << BG_DEFAULT << borderSet.VERTICAL;
-        bool is_selected = (drawingItem == this->ctx.selectedItem && this->active);
-        if(is_selected) {
-            cout << BG_HIGHLIGHT;
-            consoleSelect(fm->getBottomConsole());
-            consoleClear();
-            printf("\nStat for file %s\n", this->getItem(drawingItem).name.c_str());
-            printf("Path: %s\n", this->getItem(drawingItem).path.c_str());
-            printf("Mode: %d\n", this->getItem(drawingItem).stats.st_mode);
-            printf("Size: %lu\n", (u32)this->getItem(drawingItem).stats.st_size);
-            consoleSelect(&this->printConsole);
-        }
-        string filename = "";
-        string type = " ";
-        string supplementary = "     ";
-        if(drawingItem <= this->getMaxIndex()){
-            filename = this->getItem(drawingItem).name;
-            type = getTypeIcon(this->getItem(drawingItem));
-            supplementary = getSupplementaryInfo(this->getItem(drawingItem)).substr(0,5);
-        }
+        colors_t text_color;
+        colors_t background_color;
+        colors_t delimiter_color;
+        u32 drawingItemIndex = i + this->ctx.startingIndex;
+        bool is_selected = (drawingItemIndex == this->ctx.selectedItem && this->active);
+        // checking if there is a file at all
+        cout << position(i + offset,0) << BG_DEFAULT << borderSet.VERTICAL;
+        if(drawingItemIndex <= this->getMaxIndex()){
+            FileInfo f = this->getItem(drawingItemIndex);
+            bool is_marked = f.marked;
+            // determining text color
+            if(is_marked){
+                text_color = COLOR_YELLOW;
+            } else {
+                if(is_selected){
+                    text_color = COLOR_BLACK;
+                } else{
+                    text_color = COLOR_WHITE;
+                }
+            }
+            //determining background color
+            if(is_selected){
+                background_color = COLOR_CYAN;
+                delimiter_color = COLOR_BLACK;
+            } else {
+                background_color = COLOR_BLUE;
+                delimiter_color = COLOR_WHITE;
+            }
+            string text_style = setColor(text_color, background_color);
+            string delim_style = setColor(delimiter_color, background_color);
+            string type = getTypeIcon(f);
+            string supplementary = getSupplementaryInfo(f).substr(0,5);
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // actual writing
+            // filename
+            cout << text_style << type << leftpad(f.name, FILENAME_WIDTH);
+            // delimiter
+            cout << delim_style << borderSet.VERTICAL << text_style;
+            // additional info
+            cout << rightpad(supplementary, 5);
+            // right border
+            cout << BG_DEFAULT << borderSet.VERTICAL;
 
-        cout << type << leftpad(filename, FILENAME_WIDTH) << borderSet.VERTICAL << rightpad(supplementary, 5);
-        if(is_selected) {
-            cout << BG_DEFAULT;
+        } else {
+            cout << " " << leftpad("", FILENAME_WIDTH) << borderSet.VERTICAL<< leftpad("", 5);
         }
-        cout  << borderSet.VERTICAL;
+        cout << BG_DEFAULT << borderSet.VERTICAL;
+        cout << position(getDisplayHeight() + offset,0) << BG_DEFAULT;
+        drawFooter(borderSet, width );
+        // drawing current selected item an total # of items
+        string bottomInfo = getBottomInfo();
+        cout << position(getDisplayHeight() + offset, width - bottomInfo.length() - 3) << BG_DEFAULT_INVERTED << bottomInfo;
     }
-    cout << position(getDisplayHeight() + offset,0) << BG_DEFAULT;
-    drawFooter(borderSet, width );
-    // drawing current selected item an total # of items
-    string bottomInfo = getBottomInfo();
-    cout << position(getDisplayHeight() + offset, width - bottomInfo.length() - 3) << BG_DEFAULT_INVERTED << bottomInfo;
 }
 
 u32 FilePane::getDisplayHeight(){
@@ -304,4 +322,9 @@ void FilePane::clock(u32 kDown, u32 kHeld) {
     if (kDown & KEY_B){
         this->updir();
     }
+    if (kDown & KEY_X){
+        this->items[this->ctx.selectedItem].marked = !this->items[this->ctx.selectedItem].marked;
+        draw();
+    }
+
 }
