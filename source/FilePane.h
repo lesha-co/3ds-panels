@@ -30,7 +30,7 @@ public:
 
     FileInfo* getSelectedItem();
 
-    std::vector<FileInfo*> getMarkedItems();
+    std::vector<FileInfo*> getMarkedItems(bool fallbackToSelectedItem);
 
     std::string getCWD();
 

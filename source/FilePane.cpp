@@ -308,12 +308,16 @@ void FilePane::redraw() {
     draw();
 }
 
-vector<FileInfo*> FilePane::getMarkedItems(){
+vector<FileInfo*> FilePane::getMarkedItems(bool fallbackToSelectedItem){
     vector<FileInfo*> vec;
     for(FileInfo item : items){
         if(item.marked){
             vec.push_back(&item);
         }
+    }
+    // if there are no marked items we can return currently selected item
+    if(!vec.size() && fallbackToSelectedItem){
+        vec.push_back(this->getSelectedItem());
     }
     return vec;
 }
