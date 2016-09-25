@@ -39,10 +39,12 @@ DiskOperation::DiskOperation(DiskOperationType type, string path_from, string pa
     this->type = type;
     this->path_from = path_from;
     this->path_to = path_to;
+    this->finished = false;
+    this->started = false;
 }
 
-void DiskOperation::tick(){
-
+bool DiskOperation::tick(){
+    return true;
 }
 void DiskOperation::commence(){
     switch(this->type){

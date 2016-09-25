@@ -254,6 +254,10 @@ void FilePane::draw(){
         drawFooter(borderSet, width );
         // drawing current selected item an total # of items
         string bottomInfo = getBottomInfo();
+        u32 nMarked = getMarkedItems().size();
+        if (nMarked){
+            cout << position(getDisplayHeight() + offset, 2) << BG_DEFAULT_INVERTED << "[*" << nMarked << "]";
+        }
         cout << position(getDisplayHeight() + offset, width - bottomInfo.length() - 3) << BG_DEFAULT_INVERTED << bottomInfo;
     }
 }

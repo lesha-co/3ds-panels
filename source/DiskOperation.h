@@ -19,8 +19,10 @@ public:
                   std::string path_to);
 
     void commence();
-    void tick();
+    bool tick();
 private:
+    bool finished;
+    bool started;
     DiskOperationType type;
     std::string path_from;
     std::string path_to;
