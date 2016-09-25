@@ -14,6 +14,7 @@ class FilePane;
 
 enum Menu_t {
     MENU_COPY,
+    MENU_MOVE,
     MENU_DELETE
 };
 class FileManager {

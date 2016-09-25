@@ -15,7 +15,7 @@ FileManager::FileManager(string cwd_left, string cwd_right){
     this->mode = MODE_NORMAL;
     l->setActive(true);
     this->onCWDUpdate(active);
-    menuConfig = {MENU_COPY, MENU_DELETE};
+    menuConfig = {MENU_COPY, MENU_MOVE, MENU_DELETE};
     selectedMenuItem = 0;
 }
 
@@ -131,6 +131,9 @@ void FileManager::drawMenu(){
             case MENU_DELETE:
                 cout << "Delete...";
                 break;
+            case MENU_MOVE:
+                cout << "Move...";
+                break;
         }
         if(i == selectedMenuItem){
             cout << BG_PROMPT;
@@ -167,8 +170,18 @@ void FileManager::setmode(DisplayMode_t mode){
             this->onCWDUpdate(active);
             break;
         }
-        default:
+
+        case MODE_PROMPT_MOVE:{
+            preparePrompt(true);
+            string name = active->getSelectedItem().name;
+            string to_path = getInactivePane()->getCWD()+"/"+name;
+            printf("Move file\n\n\t%s\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL ",
+                   name.c_str(),
+                   active->getCWD().c_str(),
+                   to_path.c_str()
+            );
             break;
+        }
     }
 }
 void FileManager::clock(u32 kDown, u32 kHeld){
@@ -181,6 +194,9 @@ void FileManager::clock(u32 kDown, u32 kHeld){
                         break;
                     case MENU_DELETE:
                         setmode(MODE_PROMPT_DELETE);
+                        break;
+                    case MENU_MOVE:
+                        setmode(MODE_PROMPT_MOVE);
                         break;
                 }
             }
@@ -238,7 +254,6 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             break;
         }
         case MODE_NORMAL:
-        default:
 
             if ((kHeld | kDown) & KEY_DOWN){
                 active->moveDown();
@@ -274,6 +289,19 @@ void FileManager::clock(u32 kDown, u32 kHeld){
                 this->onCWDUpdate(active);
             }
             break;
+        case MODE_PROMPT_MOVE:{
+            if (kDown & KEY_A){
+                FileInfo f = active->getSelectedItem();
+                string to_path = getInactivePane()->getCWD()+"/"+f.name;
+                CopyFile(f.path, to_path);
+                DeleteFile(f.path);
+                this->setmode(MODE_NORMAL);
+            }
+            if (kDown & KEY_B){
+                this->setmode(MODE_NORMAL);
+            }
+            break;
+        }
     }
 }
 
