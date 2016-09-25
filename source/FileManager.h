@@ -33,20 +33,32 @@ public:
     void onCWDUpdate(FilePane* pane);
 
 private:
+    void clock_MODE_MENU(u32 kDown, u32 kHeld);
+
     void setupConsoles();
+
+    void preparePrompt(bool selectBody);
+
+    void drawMenu();
+
+    void setmode(DisplayMode_t mode);
+
+    FilePane* getInactivePane();
 
     FilePane* l;
     FilePane* r;
     FilePane* active;
+
     PrintConsole menu, leftpan, rightpan, under_panels, actions, bottom,
         prompt, prompt_body;
+
     DisplayMode_t mode;
+
     std::vector<Menu_t> menuConfig;
+
     u32 selectedMenuItem;
-    void preparePrompt(bool selectBody);
-    void drawMenu();
-    FilePane* getInactivePane();
-    void setmode(DisplayMode_t mode);
+
+    DiskOperation* op;
 };
 
 
