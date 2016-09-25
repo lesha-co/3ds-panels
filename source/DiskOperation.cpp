@@ -4,36 +4,6 @@
 
 #include "DiskOperation.h"
 using namespace std;
-void DeleteFile(string path){
-    remove(path.c_str());
-    //active->redraw();
-}
-void CopyFile(string from, string to){
-    const char* from_path = from.c_str();
-    const char* to_path = to.c_str();
-    printf("\n\n\t%s", from_path);
-    printf("\n\n\t%s", to_path);
-
-    char buf[BUFSIZ];
-    size_t size;
-
-    FILE* source = fopen(from_path, "rb");
-    FILE* dest = fopen(to_path, "wb");
-
-
-    printf("\n\n\tstarting...");
-    while (true) {
-        size = fread(buf, 1, BUFSIZ, source);
-        if (size <= 0)
-            break;
-        fwrite(buf, 1, size, dest);
-    }
-    fclose(source);
-    fclose(dest);
-
-    printf("\n\n\tOK");
-
-}
 
 DiskOperation::DiskOperation(DiskOperationType type, string path_from, string path_to){
     this->type = type;
@@ -41,25 +11,71 @@ DiskOperation::DiskOperation(DiskOperationType type, string path_from, string pa
     this->path_to = path_to;
     this->finished = false;
     this->started = false;
+    this->files_opened = false;
 }
 
-bool DiskOperation::tick(){
-    return true;
-}
-void DiskOperation::commence(){
-    switch(this->type){
-        case COPY:{
-            CopyFile(this->path_from, this->path_to);
-            break;
+void DiskOperation::copy_tick() {
+    if(this->files_opened){
+        size_t size;
+        size = fread(this->buf, 1, BUFFER_SIZE, this->source);
+        if (size <= 0){
+            fclose(this->source);
+            fclose(this->destination);
+            this->finished = true;
+        } else{
+            fwrite(this->buf, 1, size, this->destination);
         }
-        case MOVE:{
-            CopyFile(this->path_from, this->path_to);
-            DeleteFile(this->path_from);
+    } else {
+        this->source = fopen(this->path_from.c_str(), "rb");
+        this->destination = fopen(this->path_to.c_str(), "wb");
+        fseek(this->source, 0L, SEEK_END);
+        this->OperationSize = ftell(this->source);
+        rewind(this->source);
+        this->files_opened = true;
+    }
+}
+/**
+ *
+ * @return false if finished, true if not finished
+ */
+
+void DiskOperation::tick(){
+    if(!this->started || this->finished)
+        return;
+    switch (this->type){
+        case COPY:{
+            copy_tick();
             break;
         }
         case DELETE:{
-            DeleteFile(this->path_from);
+            remove(this->path_from.c_str());
+            this->finished = true;
+            break;
+        }
+        case MOVE:{
+            copy_tick();
+            if (this->finished) {
+                remove(this->path_from.c_str());
+            }
             break;
         }
     }
+}
+void DiskOperation::commence(){
+    this->started = true;
+}
+bool DiskOperation::is_finished(){
+    return this->finished;
+}
+bool DiskOperation::is_started(){
+    return this->started;
+}
+double DiskOperation::get_progress(){
+    if(!this->started || !this->files_opened){
+        return -1;
+    }
+    if(this->finished){
+        return 1;
+    }
+    return (double)ftell(this->source) / (double)this->OperationSize;
 }

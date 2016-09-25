@@ -10,6 +10,8 @@ class FilePane;
 #include "FilePane.h"
 #include "DiskOperation.h"
 #include "types.h"
+#include <unistd.h>
+#include <cmath>
 #include <vector>
 #include <string>
 

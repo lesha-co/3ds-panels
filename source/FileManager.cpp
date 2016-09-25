@@ -151,60 +151,70 @@ void FileManager::setmode(DisplayMode_t mode){
             );
             break;
         }
+        case MODE_OPERATION_PROGRESS:{
+            preparePrompt(true);
+            printf("Commencing operation\n\n");
+            if(this->op){
+                this->op->commence();
+            }
+            break;
+        }
+    }
+}
+
+void FileManager::clock_MODE_MENU(u32 kDown, u32 kHeld){
+    if ((kHeld | kDown) & KEY_A){
+        switch(menuConfig[selectedMenuItem]){
+            case MENU_COPY:
+                setmode(MODE_PROMPT_COPY);
+                break;
+            case MENU_DELETE:
+                setmode(MODE_PROMPT_DELETE);
+                break;
+            case MENU_MOVE:
+                setmode(MODE_PROMPT_MOVE);
+                break;
+        }
+    }
+    if ((kHeld | kDown) & KEY_DOWN){
+        if (selectedMenuItem >= menuConfig.size() -1){
+            selectedMenuItem = 0;
+        } else {
+            selectedMenuItem ++;
+        }
+        drawMenu();
+    }
+    if ((kHeld | kDown) & KEY_LEFT){
+        selectedMenuItem = 0;
+        drawMenu();
+    }
+    if ((kHeld | kDown) & KEY_RIGHT){
+        selectedMenuItem = menuConfig.size() -1;
+        drawMenu();
+    }
+    if ((kHeld | kDown) & KEY_UP){
+        if (selectedMenuItem == 0){
+            selectedMenuItem = menuConfig.size() -1;
+        } else {
+            selectedMenuItem --;
+        }
+        drawMenu();
+    }
+    if ((kHeld | kDown) & KEY_B){
+        this->setmode(MODE_NORMAL);
     }
 }
 void FileManager::clock(u32 kDown, u32 kHeld){
     switch(this->mode){
         case MODE_MENU:{
-            if ((kHeld | kDown) & KEY_A){
-                switch(menuConfig[selectedMenuItem]){
-                    case MENU_COPY:
-                        setmode(MODE_PROMPT_COPY);
-                        break;
-                    case MENU_DELETE:
-                        setmode(MODE_PROMPT_DELETE);
-                        break;
-                    case MENU_MOVE:
-                        setmode(MODE_PROMPT_MOVE);
-                        break;
-                }
-            }
-            if ((kHeld | kDown) & KEY_DOWN){
-                if (selectedMenuItem >= menuConfig.size() -1){
-                    selectedMenuItem = 0;
-                } else {
-                    selectedMenuItem ++;
-                }
-                drawMenu();
-            }
-            if ((kHeld | kDown) & KEY_LEFT){
-                selectedMenuItem = 0;
-                drawMenu();
-            }
-            if ((kHeld | kDown) & KEY_RIGHT){
-                selectedMenuItem = menuConfig.size() -1;
-                drawMenu();
-            }
-            if ((kHeld | kDown) & KEY_UP){
-                if (selectedMenuItem == 0){
-                    selectedMenuItem = menuConfig.size() -1;
-                } else {
-                    selectedMenuItem --;
-                }
-                drawMenu();
-            }
-            if ((kHeld | kDown) & KEY_B){
-                this->setmode(MODE_NORMAL);
-            }
+            clock_MODE_MENU(kDown, kHeld);
             break;
         }
-
         case MODE_PROMPT_DELETE:{
             if (kDown & KEY_A){
                 FileInfo* f = active->getSelectedItem();
-                DiskOperation del(DELETE, f->path, "");
-                del.commence();
-                this->setmode(MODE_NORMAL);
+                this->op = new DiskOperation(DELETE, f->path, "");
+                this->setmode(MODE_OPERATION_PROGRESS);
             }
             if (kDown & KEY_B){
                 this->setmode(MODE_NORMAL);
@@ -215,9 +225,8 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             if (kDown & KEY_A){
                 FileInfo* f = active->getSelectedItem();
                 string to_path = getInactivePane()->getCWD()+"/"+f->name;
-                DiskOperation cp(COPY, f->path, to_path);
-                cp.commence();
-                this->setmode(MODE_NORMAL);
+                this->op = new DiskOperation(COPY, f->path, to_path);
+                this->setmode(MODE_OPERATION_PROGRESS);
             }
             if (kDown & KEY_B){
                 this->setmode(MODE_NORMAL);
@@ -228,39 +237,50 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             if (kDown & KEY_A){
                 FileInfo* f = active->getSelectedItem();
                 string to_path = getInactivePane()->getCWD()+"/"+f->name;
-                DiskOperation cp(COPY, f->path, to_path);
-                DiskOperation del(DELETE, f->path, "");
-                cp.commence();
-                del.commence();
-                this->setmode(MODE_NORMAL);
+                this->op = new DiskOperation(MOVE, f->path, to_path);
+                this->setmode(MODE_OPERATION_PROGRESS);
             }
             if (kDown & KEY_B){
                 this->setmode(MODE_NORMAL);
             }
             break;
         }
-        case MODE_NORMAL:
+        case MODE_NORMAL: {
             u32 pane_controls_mask = (KEY_DOWN | KEY_UP | KEY_DLEFT | KEY_DRIGHT | KEY_A | KEY_B | KEY_X);
-            if ((kHeld | kDown) & pane_controls_mask){
+            if ((kHeld | kDown) & pane_controls_mask) {
                 active->clock(kDown & pane_controls_mask,
                               kHeld & pane_controls_mask);
             }
-            if (kDown & KEY_Y){
+            if (kDown & KEY_Y) {
                 this->setmode(MODE_MENU);
             }
-            if (kDown & KEY_L){
+            if (kDown & KEY_L) {
                 active = l;
                 l->setActive(true);
                 r->setActive(false);
                 this->onCWDUpdate(active);
             }
-            if (kDown & KEY_R){
+            if (kDown & KEY_R) {
                 active = r;
                 r->setActive(true);
                 l->setActive(false);
                 this->onCWDUpdate(active);
             }
             break;
+        }
+        case MODE_OPERATION_PROGRESS: {
+            if (this->op) {
+                this->op->tick();
+                double progress = this->op->get_progress();
+                u32 pc = (u32)(progress*100);
+                u32 current_line = (u32)prompt_body.cursorY;
+                cout << position(current_line, 0) << "\t" << pc <<"% completed";
+                if (this->op->is_finished()) {
+                    setmode(MODE_NORMAL);
+                }
+            }
+            break;
+        }
     }
 }
 
