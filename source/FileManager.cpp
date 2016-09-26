@@ -109,6 +109,32 @@ void FileManager::drawMenu(){
         }
     }
 }
+
+DiskOperationType getTypeByMode(DisplayMode_t mode){
+    switch (mode){
+        case MODE_PROMPT_DELETE:
+            return DELETE;
+        case MODE_PROMPT_COPY:
+            return COPY;
+        case MODE_PROMPT_MOVE:
+            return MOVE;
+        default:
+            // whatever
+            return DELETE;
+    }
+}
+string getVerbByMode(DisplayMode_t mode){
+    switch (mode){
+        case MODE_PROMPT_DELETE:
+            return "Delete";
+        case MODE_PROMPT_COPY:
+            return "Copy";
+        case MODE_PROMPT_MOVE:
+            return "Move";
+        default:
+            return "";
+    }
+}
 void FileManager::setmode(DisplayMode_t mode){
     this->mode = mode;
     switch(this->mode){
@@ -116,75 +142,44 @@ void FileManager::setmode(DisplayMode_t mode){
             drawMenu();
             break;
         }
-        case MODE_PROMPT_DELETE: {
+
+        case MODE_PROMPT_DELETE:
+        case MODE_PROMPT_COPY:
+        case MODE_PROMPT_MOVE:
+        {
+            DiskOperationType opType = getTypeByMode(mode);
+            string verb = getVerbByMode(mode);
+
             preparePrompt(true);
             vector<FileInfo*> items = active->getMarkedItems(true);
             for (FileInfo* pItem : items){
                 printf("Selected item: %s\n", pItem->name.c_str());
-                queue.push_back(new DiskOperation(DELETE, pItem->path, ""));
+                string to_path = "";
+                if(opType != DELETE){
+                    to_path = getInactivePane()->getCWD() + "/" + pItem->name;
+                }
+                queue.push_back(new DiskOperation(opType, pItem->path, to_path));
             }
             if (queue.size() == 0) {
                 printf("What.\n\n");
             } else if (queue.size() == 1) {
-                printf("Delete file?\n\n\tfrom: %s\n\n\t[A] OK\t[B] CANCEL\n",
-                       queue[0]->getSource().c_str()
-                );
+                cout << verb << " file?\n\n";
+                cout << "\tfrom: "<< active->getCWD() << "\n\n";
+                if(opType != DELETE){
+                    cout << "\tto:   "<< getInactivePane()->getCWD() << "\n\n";
+                }
+                cout    << "\t[A] OK\t[B] CANCEL\n";
             } else {
-                printf("Delete [%d] files?\n\n\tfrom: %s\n\n\t[A] OK\t[B] CANCEL\n",
-                       queue.size(),
-                       active->getCWD().c_str()
-                );
+                cout << verb <<" [" << queue.size() << "] files?\n\n";
+                cout << "\tfrom: "<< active->getCWD() << "\n\n";
+                if(opType != DELETE){
+                    cout << "\tto:   "<< getInactivePane()->getCWD() << "\n\n";
+                }
+                cout << "\t[A] OK\t[B] CANCEL\n";
             }
             break;
         }
-        case MODE_PROMPT_COPY: {
-            preparePrompt(true);
-            vector<FileInfo*> items = active->getMarkedItems(true);
-            for (FileInfo* pItem : items){
-                printf("Selected item: %s\n", pItem->name.c_str());
-                string to_path = getInactivePane()->getCWD() + "/" + pItem->name;
-                queue.push_back(new DiskOperation(COPY, pItem->path.c_str(), to_path.c_str()));
-            }
-            if (queue.size() == 0) {
-                printf("What.\n\n");
-            } else if (queue.size() == 1) {
-                printf("Copy file\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL\n",
-                       queue[0]->getSource().c_str(),
-                       queue[0]->getDestination().c_str()
-                );
-            } else {
-                printf("Copy [%d] files\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL\n",
-                       queue.size(),
-                       active->getCWD().c_str(),
-                       getInactivePane()->getCWD().c_str()
-                );
-            }
-            break;
-        }
-        case MODE_PROMPT_MOVE:{
-            preparePrompt(true);
-            vector<FileInfo*> items = active->getMarkedItems(true);
-            for (FileInfo* pItem : items){
-                printf("Selected item: %s\n", pItem->name.c_str());
-                string to_path = getInactivePane()->getCWD() + "/" + pItem->name;
-                queue.push_back(new DiskOperation(MOVE, pItem->path.c_str(), to_path.c_str()));
-            }
-            if (queue.size() == 0) {
-                printf("What.\n\n");
-            } else if (queue.size() == 1) {
-                printf("Move file?\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL\n",
-                       queue[0]->getSource().c_str(),
-                       queue[0]->getDestination().c_str()
-                );
-            } else {
-                printf("Copy [%d] files?\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL\n",
-                       queue.size(),
-                       active->getCWD().c_str(),
-                       getInactivePane()->getCWD().c_str()
-                );
-            }
-            break;
-        }
+
         case MODE_NORMAL: {
             this->l->redraw();
             this->r->redraw();
@@ -255,27 +250,10 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             clock_MODE_MENU(kDown, kHeld);
             break;
         }
-        case MODE_PROMPT_DELETE:{
-            if (kDown & KEY_A){
-                this->setmode(MODE_OPERATION_PROGRESS);
-            }
-            if (kDown & KEY_B){
-                this->queue.clear();
-                this->setmode(MODE_NORMAL);
-            }
-            break;
-        }
-        case MODE_PROMPT_COPY:{
-            if (kDown & KEY_A){
-                this->setmode(MODE_OPERATION_PROGRESS);
-            }
-            if (kDown & KEY_B){
-                this->queue.clear();
-                this->setmode(MODE_NORMAL);
-            }
-            break;
-        }
-        case MODE_PROMPT_MOVE:{
+        case MODE_PROMPT_DELETE:
+        case MODE_PROMPT_COPY:
+        case MODE_PROMPT_MOVE:
+        {
             if (kDown & KEY_A){
                 this->setmode(MODE_OPERATION_PROGRESS);
             }
