@@ -60,7 +60,7 @@ private:
 
     u32 selectedMenuItem;
 
-    DiskOperation* op;
+    std::vector<DiskOperation*> queue;
 };
 
 

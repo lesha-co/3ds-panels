@@ -153,9 +153,11 @@ void FileManager::setmode(DisplayMode_t mode){
         }
         case MODE_OPERATION_PROGRESS:{
             preparePrompt(true);
-            printf("Commencing operation\n\n");
-            if(this->op){
-                this->op->commence();
+            if(this->queue.size() != 0){
+                printf("Commencing operation\n\n");
+                this->queue.front()->commence();
+            } else{
+                setmode(MODE_NORMAL);
             }
             break;
         }
@@ -213,7 +215,7 @@ void FileManager::clock(u32 kDown, u32 kHeld){
         case MODE_PROMPT_DELETE:{
             if (kDown & KEY_A){
                 FileInfo* f = active->getSelectedItem();
-                this->op = new DiskOperation(DELETE, f->path, "");
+                this->queue.push_back(new DiskOperation(DELETE, f->path, ""));
                 this->setmode(MODE_OPERATION_PROGRESS);
             }
             if (kDown & KEY_B){
@@ -225,7 +227,7 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             if (kDown & KEY_A){
                 FileInfo* f = active->getSelectedItem();
                 string to_path = getInactivePane()->getCWD()+"/"+f->name;
-                this->op = new DiskOperation(COPY, f->path, to_path);
+                this->queue.push_back(new DiskOperation(COPY, f->path, to_path));
                 this->setmode(MODE_OPERATION_PROGRESS);
             }
             if (kDown & KEY_B){
@@ -237,7 +239,7 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             if (kDown & KEY_A){
                 FileInfo* f = active->getSelectedItem();
                 string to_path = getInactivePane()->getCWD()+"/"+f->name;
-                this->op = new DiskOperation(MOVE, f->path, to_path);
+                this->queue.push_back(new DiskOperation(MOVE, f->path, to_path));
                 this->setmode(MODE_OPERATION_PROGRESS);
             }
             if (kDown & KEY_B){
@@ -269,14 +271,16 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             break;
         }
         case MODE_OPERATION_PROGRESS: {
-            if (this->op) {
-                this->op->tick();
-                double progress = this->op->get_progress();
+            if(this->queue.size() != 0){
+                this->queue.front()->tick();
+                double progress = this->queue.front()->get_progress();
                 u32 pc = (u32)(progress*100);
                 u32 current_line = (u32)prompt_body.cursorY;
                 cout << position(current_line, 0) << "\t" << pc <<"% completed";
-                if (this->op->is_finished()) {
-                    setmode(MODE_NORMAL);
+                if (this->queue.front()->is_finished()) {
+                    this->queue.erase(this->queue.begin());
+                    // resetting mode_operation_progress so it grabs next job from queue;
+                    setmode(MODE_OPERATION_PROGRESS);
                 }
             }
             break;
