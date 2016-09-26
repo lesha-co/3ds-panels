@@ -53,10 +53,9 @@ void DiskOperation::tick(){
             break;
         }
         case MOVE:{
-            copy_tick();
-            if (this->finished) {
-                remove(this->path_from.c_str());
-            }
+            rename(this->path_from.c_str(),
+                   this->path_to.c_str());
+            this->finished = true;
             break;
         }
     }
