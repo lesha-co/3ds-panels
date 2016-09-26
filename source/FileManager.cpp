@@ -5,6 +5,19 @@
 
 using namespace std;
 int list_called = 0;
+
+string getVerbByOpType(DiskOperationType mode){
+    switch (mode){
+        case COPY:
+            return "Copy";
+        case MOVE:
+            return "Move";
+        case DELETE:
+            return "Delete";
+    }
+    return "";
+}
+
 FileManager::FileManager(string cwd_left, string cwd_right){
     setupConsoles();
     this->l = new FilePane(leftpan, this);
@@ -95,13 +108,13 @@ void FileManager::drawMenu(){
         cout << position(i,0);
         switch(menuConfig[i]){
             case MENU_COPY:
-                cout << "Copy...";
+                cout << getVerbByOpType(COPY) << "...";
                 break;
             case MENU_DELETE:
-                cout << "Delete...";
+                cout << getVerbByOpType(DELETE) << "...";
                 break;
             case MENU_MOVE:
-                cout << "Move...";
+                cout << getVerbByOpType(MOVE) << "...";
                 break;
         }
         if(i == selectedMenuItem){
@@ -110,17 +123,6 @@ void FileManager::drawMenu(){
     }
 }
 
-string getVerbByOpType(DiskOperationType mode){
-    switch (mode){
-        case COPY:
-            return "Copy";
-        case MOVE:
-            return "Move";
-        case DELETE:
-            return "Delete";
-    }
-    return "";
-}
 void FileManager::setmode(DisplayMode_t mode){
     this->mode = mode;
     switch(this->mode){
@@ -143,15 +145,12 @@ void FileManager::setmode(DisplayMode_t mode){
             }
             if (queue.size() == 0) {
                 printf("What.\n\n");
-            } else if (queue.size() == 1) {
-                cout << verb << " file?\n\n";
-                cout << "\tfrom: "<< active->getCWD() << "\n\n";
-                if(pendingOperationType != DELETE){
-                    cout << "\tto:   "<< getInactivePane()->getCWD() << "\n\n";
-                }
-                cout    << "\t[A] OK\t[B] CANCEL\n";
             } else {
-                cout << verb <<" [" << queue.size() << "] files?\n\n";
+                if (queue.size() == 1) {
+                    cout << verb << " file?\n\n";
+                } else {
+                    cout << verb <<" [" << queue.size() << "] files?\n\n";
+                }
                 cout << "\tfrom: "<< active->getCWD() << "\n\n";
                 if(pendingOperationType != DELETE){
                     cout << "\tto:   "<< getInactivePane()->getCWD() << "\n\n";
@@ -175,7 +174,7 @@ void FileManager::setmode(DisplayMode_t mode){
                 printf("%s\n", this->queue.front()->getSource().c_str());
                 this->queue.front()->commence();
             } else{
-                printf("\nFinished. [B] to close window");
+                printf("\n\nFinished. [B] to close window");
                 //setmode(MODE_NORMAL);
             }
             break;
@@ -273,9 +272,11 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             if(this->queue.size() != 0){
                 this->queue.front()->tick();
                 double progress = this->queue.front()->get_progress();
-                u32 pc = (u32)(progress*100);
+                //u32 pc = (u32)(progress*100);
                 u32 current_line = (u32)prompt_body.cursorY;
-                cout << position(current_line, 0) << "\t" << pc <<"% completed";
+                //cout << "\t" << pc <<"% completed\n";
+                cout << position(current_line, 0);
+                cout << draw_progressbar((u32)prompt_body.windowWidth, progress);
                 if (this->queue.front()->is_finished()) {
                     this->queue.erase(this->queue.begin());
                     // resetting mode_operation_progress so it grabs next job from queue;
