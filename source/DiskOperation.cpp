@@ -78,3 +78,9 @@ double DiskOperation::get_progress(){
     }
     return (double)ftell(this->source) / (double)this->OperationSize;
 }
+string DiskOperation::getSource(){
+    return path_from;
+}
+string DiskOperation::getDestination(){
+    return path_to;
+}

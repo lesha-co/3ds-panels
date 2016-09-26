@@ -25,6 +25,8 @@ public:
     bool is_finished();
     bool is_started();
     double get_progress();
+    std::string getSource();
+    std::string getDestination();
 private:
     void copy_tick();
     bool finished;
