@@ -175,6 +175,7 @@ void FileManager::setmode(DisplayMode_t mode){
                 this->queue.front()->commence();
             } else{
                 printf("\n\nFinished. [B] to close window");
+                this->queue.clear();
                 //setmode(MODE_NORMAL);
             }
             break;
