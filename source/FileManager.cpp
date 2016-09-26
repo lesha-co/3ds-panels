@@ -124,13 +124,28 @@ void FileManager::setmode(DisplayMode_t mode){
         }
         case MODE_PROMPT_COPY: {
             preparePrompt(true);
-            string name = active->getSelectedItem()->name;
-            string to_path = getInactivePane()->getCWD()+"/"+name;
-            printf("Copy file\n\n\t%s\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL ",
-                   name.c_str(),
-                   active->getCWD().c_str(),
-                   to_path.c_str()
-            );
+            vector<FileInfo*> items = active->getMarkedItems(true);
+            for (FileInfo* pItem : items){
+                printf("Selected item: %s\n", pItem->name.c_str());
+                string to_path = getInactivePane()->getCWD() + "/" + pItem->name;
+                queue.push_back(new DiskOperation(COPY, pItem->path.c_str(), to_path.c_str()));
+            }
+            if (queue.size() == 0) {
+                printf("What.\n\n");
+            } else if (queue.size() == 1) {
+                printf("Copy file\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL ",
+                       queue[0]->getSource().c_str(),
+                       queue[0]->getDestination().c_str()
+                );
+            } else {
+                printf("Copy [%d] files\n\n\tfrom: %s\n\n\tto:   %s\n\n\t[A] OK\t[B] CANCEL ",
+                       queue.size(),
+                       active->getCWD().c_str(),
+                       getInactivePane()->getCWD().c_str()
+                );
+            }
+
+
             break;
         }
         case MODE_NORMAL: {
@@ -152,12 +167,14 @@ void FileManager::setmode(DisplayMode_t mode){
             break;
         }
         case MODE_OPERATION_PROGRESS:{
-            preparePrompt(true);
+            //preparePrompt(true);
             if(this->queue.size() != 0){
-                printf("Commencing operation\n\n");
+                printf("\n\nCommencing operation\n");
+                printf("%s\n", this->queue.front()->getSource().c_str());
                 this->queue.front()->commence();
             } else{
-                setmode(MODE_NORMAL);
+                printf("\nFinished. [B] to close window");
+                //setmode(MODE_NORMAL);
             }
             break;
         }
@@ -225,12 +242,13 @@ void FileManager::clock(u32 kDown, u32 kHeld){
         }
         case MODE_PROMPT_COPY:{
             if (kDown & KEY_A){
-                FileInfo* f = active->getSelectedItem();
-                string to_path = getInactivePane()->getCWD()+"/"+f->name;
-                this->queue.push_back(new DiskOperation(COPY, f->path, to_path));
+                //FileInfo* f = active->getSelectedItem();
+                //string to_path = getInactivePane()->getCWD()+"/"+f->name;
+                //this->queue.push_back(new DiskOperation(COPY, f->path, to_path));
                 this->setmode(MODE_OPERATION_PROGRESS);
             }
             if (kDown & KEY_B){
+                this->queue.empty();
                 this->setmode(MODE_NORMAL);
             }
             break;
@@ -271,6 +289,9 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             break;
         }
         case MODE_OPERATION_PROGRESS: {
+            if (kDown & KEY_B){
+                this->setmode(MODE_NORMAL);
+            }
             if(this->queue.size() != 0){
                 this->queue.front()->tick();
                 double progress = this->queue.front()->get_progress();
