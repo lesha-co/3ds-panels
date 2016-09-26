@@ -110,30 +110,16 @@ void FileManager::drawMenu(){
     }
 }
 
-DiskOperationType getTypeByMode(DisplayMode_t mode){
+string getVerbByOpType(DiskOperationType mode){
     switch (mode){
-        case MODE_PROMPT_DELETE:
-            return DELETE;
-        case MODE_PROMPT_COPY:
-            return COPY;
-        case MODE_PROMPT_MOVE:
-            return MOVE;
-        default:
-            // whatever
-            return DELETE;
-    }
-}
-string getVerbByMode(DisplayMode_t mode){
-    switch (mode){
-        case MODE_PROMPT_DELETE:
-            return "Delete";
-        case MODE_PROMPT_COPY:
+        case COPY:
             return "Copy";
-        case MODE_PROMPT_MOVE:
+        case MOVE:
             return "Move";
-        default:
-            return "";
+        case DELETE:
+            return "Delete";
     }
+    return "";
 }
 void FileManager::setmode(DisplayMode_t mode){
     this->mode = mode;
@@ -142,37 +128,32 @@ void FileManager::setmode(DisplayMode_t mode){
             drawMenu();
             break;
         }
-
-        case MODE_PROMPT_DELETE:
-        case MODE_PROMPT_COPY:
-        case MODE_PROMPT_MOVE:
+        case MODE_PROMPT:
         {
-            DiskOperationType opType = getTypeByMode(mode);
-            string verb = getVerbByMode(mode);
-
+            string verb = getVerbByOpType(pendingOperationType);
             preparePrompt(true);
             vector<FileInfo*> items = active->getMarkedItems(true);
             for (FileInfo* pItem : items){
                 printf("Selected item: %s\n", pItem->name.c_str());
                 string to_path = "";
-                if(opType != DELETE){
+                if(pendingOperationType != DELETE){
                     to_path = getInactivePane()->getCWD() + "/" + pItem->name;
                 }
-                queue.push_back(new DiskOperation(opType, pItem->path, to_path));
+                queue.push_back(new DiskOperation(pendingOperationType, pItem->path, to_path));
             }
             if (queue.size() == 0) {
                 printf("What.\n\n");
             } else if (queue.size() == 1) {
                 cout << verb << " file?\n\n";
                 cout << "\tfrom: "<< active->getCWD() << "\n\n";
-                if(opType != DELETE){
+                if(pendingOperationType != DELETE){
                     cout << "\tto:   "<< getInactivePane()->getCWD() << "\n\n";
                 }
                 cout    << "\t[A] OK\t[B] CANCEL\n";
             } else {
                 cout << verb <<" [" << queue.size() << "] files?\n\n";
                 cout << "\tfrom: "<< active->getCWD() << "\n\n";
-                if(opType != DELETE){
+                if(pendingOperationType != DELETE){
                     cout << "\tto:   "<< getInactivePane()->getCWD() << "\n\n";
                 }
                 cout << "\t[A] OK\t[B] CANCEL\n";
@@ -206,15 +187,17 @@ void FileManager::clock_MODE_MENU(u32 kDown, u32 kHeld){
     if ((kHeld | kDown) & KEY_A){
         switch(menuConfig[selectedMenuItem]){
             case MENU_COPY:
-                setmode(MODE_PROMPT_COPY);
+                pendingOperationType = COPY;
                 break;
             case MENU_DELETE:
-                setmode(MODE_PROMPT_DELETE);
+                pendingOperationType = DELETE;
                 break;
             case MENU_MOVE:
-                setmode(MODE_PROMPT_MOVE);
+                pendingOperationType = MOVE;
                 break;
         }
+        setmode(MODE_PROMPT);
+        return;
     }
     if ((kHeld | kDown) & KEY_DOWN){
         if (selectedMenuItem >= menuConfig.size() -1){
@@ -250,10 +233,7 @@ void FileManager::clock(u32 kDown, u32 kHeld){
             clock_MODE_MENU(kDown, kHeld);
             break;
         }
-        case MODE_PROMPT_DELETE:
-        case MODE_PROMPT_COPY:
-        case MODE_PROMPT_MOVE:
-        {
+        case MODE_PROMPT: {
             if (kDown & KEY_A){
                 this->setmode(MODE_OPERATION_PROGRESS);
             }

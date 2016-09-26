@@ -61,6 +61,8 @@ private:
     u32 selectedMenuItem;
 
     std::vector<DiskOperation*> queue;
+
+    DiskOperationType pendingOperationType;
 };
 
 
