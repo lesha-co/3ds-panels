@@ -263,16 +263,17 @@ void FilePane::draw(){
             cout << " " << leftpad("", FILENAME_WIDTH) << borderSet.VERTICAL<< leftpad("", 5);
         }
         cout << BG_DEFAULT << borderSet.VERTICAL;
-        cout << position(getDisplayHeight() + offset,0) << BG_DEFAULT;
-        drawFooter(borderSet, width );
-        // drawing current selected item an total # of items
-        string bottomInfo = getBottomInfo();
-        u32 nMarked = getMarkedItems(false).size();
-        if (nMarked){
-            cout << position(getDisplayHeight() + offset, 2) << BG_DEFAULT_INVERTED << "[*" << nMarked << "]";
-        }
-        cout << position(getDisplayHeight() + offset, width - bottomInfo.length() - 3) << BG_DEFAULT_INVERTED << bottomInfo;
     }
+    cout << position(getDisplayHeight() + offset,0) << BG_DEFAULT;
+    drawFooter(borderSet, width );
+    // drawing current selected item an total # of items
+    string bottomInfo = getBottomInfo();
+    vector<FileInfo*> fis =getMarkedItems(false);
+    u32 nMarked = fis.size();
+    if (nMarked){
+        cout << position(getDisplayHeight() + offset, 2) << BG_DEFAULT_INVERTED << "[*" << nMarked << "]";
+    }
+    cout << position(getDisplayHeight() + offset, width - bottomInfo.length() - 3) << BG_DEFAULT_INVERTED << bottomInfo;
 }
 
 u32 FilePane::getDisplayHeight(){
@@ -323,9 +324,9 @@ void FilePane::redraw() {
 
 vector<FileInfo*> FilePane::getMarkedItems(bool fallbackToSelectedItem){
     vector<FileInfo*> vec;
-    for(FileInfo item : items){
-        if(item.marked){
-            vec.push_back(&item);
+    for (u32 i = 0; i < items.size(); ++i) {
+        if(items[i].marked){
+            vec.push_back(&items[i]);
         }
     }
     // if there are no marked items we can return currently selected item
