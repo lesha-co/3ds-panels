@@ -1,6 +1,7 @@
 //
 // Created by lichevsky on 24.09.16.
 //
+#include <algorithm>
 #include "FileManager.h"
 
 using namespace std;
@@ -323,6 +324,21 @@ vector<FileInfo> FileManager::list_files(string dir){
         }
         closedir( dp );
     }
+    // sorting
+    struct {
+        bool operator()(FileInfo a, FileInfo b)
+        {
+            bool isDirA = S_ISDIR(a.stats.st_mode);
+            bool isDirB = S_ISDIR(b.stats.st_mode);
+            // directories_first
+            if(isDirA != isDirB){
+                return isDirA > isDirB;
+            }
+            // alphabetically
+            return a.name < b.name;
+        }
+    } fileSort;
+    sort(v.begin(), v.end(), fileSort);
     return v;
 }
 
