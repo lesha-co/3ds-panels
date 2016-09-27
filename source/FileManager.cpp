@@ -317,6 +317,7 @@ vector<FileInfo> FileManager::list_files(string dir){
             FileInfo fi;
             fi.name = dirp->d_name;
             fi.marked = false;
+            fi.special = false;
             fi.path = dir + "/" + dirp->d_name;
             stat( fi.path.c_str(), &fi.stats );
 
@@ -328,6 +329,9 @@ vector<FileInfo> FileManager::list_files(string dir){
     struct {
         bool operator()(FileInfo a, FileInfo b)
         {
+            if(a.special != b.special){
+                return a.special > b.special;
+            }
             bool isDirA = S_ISDIR(a.stats.st_mode);
             bool isDirB = S_ISDIR(b.stats.st_mode);
             // directories_first
