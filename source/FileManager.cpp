@@ -162,6 +162,7 @@ void FileManager::setmode(DisplayMode_t mode){
         }
 
         case MODE_NORMAL: {
+            this->queue.clear();
             this->l->redraw();
             this->r->redraw();
             this->onCWDUpdate(active);
@@ -239,7 +240,7 @@ void FileManager::clock(u32 kDown, u32 kHeld){
                 this->setmode(MODE_OPERATION_PROGRESS);
             }
             if (kDown & KEY_B){
-                this->queue.clear();
+                //this->queue.clear();
                 this->setmode(MODE_NORMAL);
             }
             break;
@@ -269,20 +270,31 @@ void FileManager::clock(u32 kDown, u32 kHeld){
         }
         case MODE_OPERATION_PROGRESS: {
             if (kDown & KEY_B){
-                this->setmode(MODE_NORMAL);
-            }
-            if(this->queue.size() != 0){
-                this->queue.front()->tick();
-                double progress = this->queue.front()->get_progress();
-                //u32 pc = (u32)(progress*100);
-                u32 current_line = (u32)prompt_body.cursorY;
-                //cout << "\t" << pc <<"% completed\n";
-                cout << position(current_line, 0);
-                cout << draw_progressbar((u32)prompt_body.windowWidth, progress);
-                if (this->queue.front()->is_finished()) {
-                    this->queue.erase(this->queue.begin());
-                    // resetting mode_operation_progress so it grabs next job from queue;
-                    setmode(MODE_OPERATION_PROGRESS);
+                if(this->queue.size() == 0){
+                    this->setmode(MODE_NORMAL);
+                } else if(this->queue.size() != 0){
+                    printf("\n\n\tABORTING...");
+                    if(this->queue.front()->is_started() && !this->queue.front()->is_finished()){
+                        this->queue.front()->abort();
+                        printf("\n\tOK. [B] TO RETURN\n");
+                    }
+                    this->queue.clear();
+                }
+            } else {
+                if(this->queue.size() != 0){
+                    DiskOperation* op = this->queue.front();
+                    op->tick();
+                    double progress = op->get_progress();
+                    //u32 pc = (u32)(progress*100);
+                    u32 current_line = (u32)prompt_body.cursorY;
+                    //cout << "\t" << pc <<"% completed\n";
+                    cout << position(current_line, 0);
+                    cout << draw_progressbar((u32)prompt_body.windowWidth, progress);
+                    if (op->is_finished()) {
+                        this->queue.erase(this->queue.begin());
+                        // resetting mode_operation_progress so it grabs next job from queue;
+                        setmode(MODE_OPERATION_PROGRESS);
+                    }
                 }
             }
             break;

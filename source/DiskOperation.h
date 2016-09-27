@@ -22,6 +22,7 @@ public:
 
     void commence();
     void tick();
+    void abort();
     bool is_finished();
     bool is_started();
     double get_progress();

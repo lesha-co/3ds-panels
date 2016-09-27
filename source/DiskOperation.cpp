@@ -21,6 +21,7 @@ void DiskOperation::copy_tick() {
         if (size <= 0){
             fclose(this->source);
             fclose(this->destination);
+            this->files_opened = false;
             this->finished = true;
         } else{
             fwrite(this->buf, 1, size, this->destination);
@@ -63,6 +64,17 @@ void DiskOperation::tick(){
 void DiskOperation::commence(){
     this->started = true;
 }
+void DiskOperation::abort(){
+    bool wasFinished = this->is_finished();
+    this->finished = true;
+    if(this->files_opened){
+        fclose(this->source);
+        fclose(this->destination);
+        if (this->type == COPY && !wasFinished){
+            remove(this->path_to.c_str());
+        }
+    }
+}
 bool DiskOperation::is_finished(){
     return this->finished;
 }
@@ -70,7 +82,7 @@ bool DiskOperation::is_started(){
     return this->started;
 }
 double DiskOperation::get_progress(){
-    if(!this->started || !this->files_opened){
+    if(!this->started && !this->files_opened){
         return -1;
     }
     if(this->finished){
