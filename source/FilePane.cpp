@@ -210,6 +210,14 @@ void FilePane::draw(){
     drawHeader(borderSet, width);
     cout << position(0,1) << BG_DEFAULT_INVERTED << "Name";
     cout << position(0,FILENAME_WIDTH+3) << "Size";
+    // scrollbar prep
+    double scrollbar_start = 0;
+    double scrollbar_end = 0;
+    if(this->getNumberOfItems() > this->getDisplayHeight()){
+        scrollbar_start = (double)(this->ctx.startingIndex * this->getDisplayHeight())/(double)this->getNumberOfItems();
+        scrollbar_end = (double)(this->getBottomIndex() * this->getDisplayHeight())/(double)this->getNumberOfItems();
+    }
+
     // number of lines we need to skip from the top of under_panels ( top border in this case)
     u32 offset = 1;
     for (u32 i = 0; i < this->getDisplayHeight() ; ++i) {
@@ -256,13 +264,15 @@ void FilePane::draw(){
             cout << delim_style << borderSet.VERTICAL << text_style;
             // additional info
             cout << rightpad(supplementary, 5);
-            // right border
-            cout << BG_DEFAULT << borderSet.VERTICAL;
-
         } else {
             cout << " " << leftpad("", FILENAME_WIDTH) << borderSet.VERTICAL<< leftpad("", 5);
         }
-        cout << BG_DEFAULT << borderSet.VERTICAL;
+        cout << BG_DEFAULT;
+        if (i >= scrollbar_start && i < scrollbar_end) {
+            cout << PROGRESSBAR_FILLED;
+        } else {
+            cout << PROGRESSBAR_EMPTY;
+        }
     }
     cout << position(getDisplayHeight() + offset,0) << BG_DEFAULT;
     drawFooter(borderSet, width );
